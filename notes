@@ -1,7 +1,0 @@
-+ parsing
-
-		> use get_next_line to get each line from the file and output everything
-		into a char **map while skipping lines that have nothing
-		> make a function that turns char **map into a linked list, the catch is
-		to add simple nodes that contain text like "TEXTURE BEGIN" or "MAP BEGIN"
-		to mark the start of sections to make parsing and error handling easier
