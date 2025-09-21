@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/20 20:39:12 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/21 16:00:30 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,8 @@ int			test_assets(t_parse_data *p_data);
 void		skip_leading_spaces(t_parse_data *p_data);
 char		**extract_map(t_parse_data *p_data);
 int			is_map(char *s);
+int			check_enclosed(t_parse_data *p_data);
+int			get_player_pos(t_parse_data *p_data);
 int			ft_strcmp(const char *s1, const char *s2);
 char		*ft_strchr(const char *s, int c);
 char		**ft_split(const char *s, char c);

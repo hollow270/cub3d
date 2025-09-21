@@ -1,0 +1,11 @@
+NO assets/north_wall.xpm
+SO assets/east_wall.xpm
+WE assets/south_wall.xpm
+EA assets/west_wall.xpm
+
+F 20,20,20
+C 200,200,200
+
+111111111111111111111
+1N0000000000000000001
+111111111111111111111
