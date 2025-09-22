@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 11:13:24 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/20 14:14:21 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/21 18:11:44 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,4 +92,14 @@ int	ft_atoi(const char *nptr)
 			return (0);
 	}
 	return ((int)(sign * num));
+}
+
+int	ft_splitlen(char **split)
+{
+	int	i;
+
+	i = 0;
+	while (split[i])
+		i++;
+	return (i);
 }

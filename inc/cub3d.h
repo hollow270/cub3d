@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/21 16:00:30 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/21 18:12:05 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ size_t		ft_strlcpy(char *dest, const char *src, size_t n);
 char		*ft_strdup(const char *s);
 int			ft_strncmp(const char *s1, const char *s2, size_t n);
 int			ft_atoi(const char *nptr);
+int		ft_splitlen(char **split);
 void		free_map_lines(t_map_line *head);
 void		*gc_malloc(size_t size);
 void		gc_free_all(void);

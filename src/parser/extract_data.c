@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 15:10:45 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/20 17:31:23 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/21 18:09:20 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ void	extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag)
 	int		i;
 
 	values = ft_split(cur_line->line + 2, ',');
+	if (ft_splitlen(values) > 3)
+		return ;
 	if (validate_values(values) == 0)
 		return ;
 	i = 0;
