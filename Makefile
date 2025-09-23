@@ -1,5 +1,5 @@
 CC = gcc -g #-Wall -Wextra -Werror
-MLXFALGS = -lXext -lX11
+MLXFALGS = -lXext -lX11 -lm
 
 ARC = src/.mlx/libmlx_Linux.a
 INC = inc/
@@ -16,7 +16,9 @@ NAME = cub3d
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) -I$(INC) -I$(MLXINC) $(ARC) $(OBJ) $(MLXFALGS) -o $(NAME)
+	$(CC) -I$(INC) -I$(MLXINC) $(OBJ) $(ARC) $(MLXFALGS) -o $(NAME)
+#$(NAME): $(OBJ)
+#	$(CC) -I$(INC) -I$(MLXINC) $(ARC) $(OBJ) $(MLXFALGS) -o $(NAME)
 
 %.o: %.c $(HED)
 	$(CC) -I$(INC) -I$(MLXINC) -c $< -o $@

@@ -6,23 +6,33 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/21 18:12:05 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/22 20:12:15 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
+# include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include "get_next_line.h"
+# include "../src/.mlx/mlx.h"
 
 # define NO_WALL "./assets/north_wall.xpm"
 # define EA_WALL "./assets/east_wall.xpm"
 # define SO_WALL "./assets/south_wall.xpm"
 # define WE_WALL "./assets/west_wall.xpm"
+
+typedef struct s_sprites
+{
+	void	*north_wall;
+	void	*east_wall;
+	void	*south_wall;
+	void	*west_wall;
+}			t_sprites;
 
 typedef struct s_assets
 {
@@ -34,13 +44,6 @@ typedef struct s_assets
 	int		c_rgb[3];
 }			t_assets;
 
-typedef struct s_color
-{
-	int	r;
-	int	g;
-	int	b;
-}		t_color;
-
 typedef struct s_map_line
 {
 	char				*line;
@@ -50,24 +53,59 @@ typedef struct s_map_line
 typedef struct s_parse_data
 {
 	t_assets	*assets;
-	t_color		*c_color;
-	t_color		*f_color;
 	int			is_valid;
 	char		**file_content;
 	char		**matrix;
 	t_map_line	*map_lines;
-	int			map_height;
-	int			map_width;
-	int			p_x;
-	int			p_y;
-	int			players;
+	float		p_x;
+	float		p_y;
 }				t_parse_data;
+
+typedef struct s_vars
+{
+	void			*mlx;
+	void			*win;
+	t_parse_data	p_data;
+	t_sprites		*sprites;
+}					t_vars;
 
 typedef struct s_garbage
 {
 	void				*ptr;
 	struct s_garbage	*next;
 }						t_garbage;
+
+/*		TESTING			*/
+
+typedef struct s_player
+{
+	double	pos_x;
+	double	pos_y;
+	double	dir_x;
+	double	dir_y;
+	double	plane_x;
+	double	plane_y;
+}	t_player;
+
+typedef struct s_img
+{
+	void	*img;
+	int		*data;
+	int		bpp;
+	int		line_len;
+	int		endian;
+}	t_img;
+
+typedef struct s_game
+{
+	t_vars		*vars;
+	t_player	player;
+	t_img		img;
+	int			win_w;
+	int			win_h;
+}	t_game;
+
+/*		TESTING			*/
 
 int			parse_map_file(char *file_name, t_parse_data *p_data);
 t_map_line	*interpret_file_content(t_parse_data *p_data);

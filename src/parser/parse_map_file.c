@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:19:52 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/21 16:01:31 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/22 17:24:24 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ int	parse_map_file(char *file_name, t_parse_data *p_data)
 		return (close(fd), printf("Error\nMap is not enclosed in walls\n"), 0);
 	if (get_player_pos(p_data) == 0)
 		return (close(fd), printf("Error\nMore than one player in map/Invalid char found in map\n"), 0);
-	printf("p_x = [%d]\np_y = [%d]\n", p_data->p_x, p_data->p_y);
 	return (close(fd), 1);
 }
 
