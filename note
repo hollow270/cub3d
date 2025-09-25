@@ -1,0 +1,34 @@
+void simple_render_map(int *image_data, int line_length, char **map, int map_height, int map_width)
+{
+    int map_x, map_y;
+    int pixel_x, pixel_y;
+    int cube_x, cube_y;
+    
+    for (map_y = 0; map_y < map_height; map_y++)
+    {
+        for (map_x = 0; map_x < map_width; map_x++)
+        {
+            if (map[map_y][map_x] == '1')
+            {
+                // Calculate starting pixel position for this cube
+                int start_pixel_x = map_x * CUBE_SIZE;
+                int start_pixel_y = map_y * CUBE_SIZE;
+                
+                // Fill the 64x64 cube with white pixels
+                for (cube_y = 0; cube_y < CUBE_SIZE; cube_y++)
+                {
+                    for (cube_x = 0; cube_x < CUBE_SIZE; cube_x++)
+                    {
+                        pixel_x = start_pixel_x + cube_x;
+                        pixel_y = start_pixel_y + cube_y;
+                        
+                        // Convert 2D to 1D: index = y * width_in_pixels + x
+                        // Note: line_length is in bytes, so divide by 4 for int array
+                        int index = pixel_y * (line_length / 4) + pixel_x;
+                        image_data[index] = WHITE;
+                    }
+                }
+            }
+        }
+    }
+}

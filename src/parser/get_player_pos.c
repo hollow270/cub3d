@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:50:59 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/22 19:51:41 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/25 16:16:42 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ int	get_player_pos(t_parse_data *p_data)
 		{
 			if (is_player(map[y][x]) && found == 0)
 			{
-				p_data->p_x = (float)x;
-				p_data->p_y = (float)y;
+				p_data->p_x = (float)x + 0.5;
+				p_data->p_y = (float)y + 0.5;
 				found++;
 			}
 			else if (is_player(map[y][x]) && found != 0)

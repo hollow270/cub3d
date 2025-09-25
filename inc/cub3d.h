@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/22 20:12:15 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/25 19:41:25 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,35 @@ typedef struct s_garbage
 	struct s_garbage	*next;
 }						t_garbage;
 
-/*		TESTING			*/
+typedef struct s_player
+{
+	double	pos_x;
+	double	pos_y;
+	double	dir_x;
+	double	dir_y;
+	double	plane_x;
+	double	plane_y;
+}	t_player;
+
+typedef struct s_img
+{
+	void	*img;
+	int		*data;
+	int		bpp;
+	int		line_len;
+	int		endian;
+}	t_img;
+
+typedef struct s_game
+{
+	t_vars		*vars;
+	t_player	player;
+	t_img		img;
+	int			win_w;
+	int			win_h;
+}	t_game;
+
+/*		TESTING			
 
 typedef struct s_player
 {
@@ -105,7 +133,7 @@ typedef struct s_game
 	int			win_h;
 }	t_game;
 
-/*		TESTING			*/
+		TESTING			*/
 
 int			parse_map_file(char *file_name, t_parse_data *p_data);
 t_map_line	*interpret_file_content(t_parse_data *p_data);

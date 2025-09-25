@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/23 14:35:10 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/25 21:15:48 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	check_extension(char *file_name);
 
-#define MOVE_SPEED 0.1
+/*#define MOVE_SPEED 0.1
 #define ROT_SPEED 0.05
 
 static void	init_player(t_game *g, char **map)
@@ -218,6 +218,192 @@ void	init_game(t_vars *vars)
 	mlx_hook(vars->win, 17, 0, handle_close, g);    // close window
 
 	mlx_loop(vars->mlx);
+}*/
+
+#define CUBE_SIZE 64
+#define PLAYER_SIZE 10
+#define MOVE_SPEED 0.1
+#define WHITE 0xFFFFFF
+#define BLACK 0x000000
+#define PLAYER_COLOR 0xFF0000
+
+/*int	check_new_position(double new_x, double new_y, t_game *g, int dir)
+{
+	float	cast_y;
+	float	cast_x;
+
+	cast_y = new_y;
+	cast_x = new_x;
+	if (dir == 'a' || dir == 'w')
+	{
+		if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)] == '1')
+			return (0);
+	}
+	else if (dir == 'd' || dir == 's')
+	{
+		if (g->vars->p_data.matrix[(int)(new_y + 0.1)][(int)(new_x + 0.1)] == '1')
+			return (0);
+	}
+	return (1);
+}*/
+
+int check_new_position(double new_x, double new_y, t_game *g, int dir)
+{
+    double player_size_in_map = (double)PLAYER_SIZE / CUBE_SIZE;
+    
+    if (dir == 'a' || dir == 'w')
+    {
+        // For left/up movement, check top-left corner
+        if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)] == '1')
+            return (0);
+    }
+    else if (dir == 'd')
+    {
+        // For right movement, check top-right corner
+        if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x + player_size_in_map)] == '1')
+            return (0);
+    }
+    else if (dir == 's')
+    {
+        // For down movement, check bottom-left corner
+        if (g->vars->p_data.matrix[(int)(new_y + player_size_in_map)][(int)(new_x)] == '1')
+            return (0);
+    }
+    return (1);
+}
+
+int	controls(int keycode, t_game *g)
+{
+	if (keycode == 'w' && check_new_position(g->player.pos_x, g->player.pos_y - MOVE_SPEED, g, 'w'))
+		g->player.pos_y -= MOVE_SPEED;
+	if (keycode == 'd' && check_new_position(g->player.pos_x + MOVE_SPEED, g->player.pos_y, g, 'd'))
+		g->player.pos_x += MOVE_SPEED;
+	if (keycode == 's' && check_new_position(g->player.pos_x, g->player.pos_y + MOVE_SPEED, g, 's'))
+		g->player.pos_y += MOVE_SPEED;
+	if (keycode == 'a' && check_new_position(g->player.pos_x - MOVE_SPEED, g->player.pos_y, g, 'a'))
+		g->player.pos_x -= MOVE_SPEED;
+}
+
+void	render_player(t_game *g)
+{
+	int		start_player_x;
+	int		start_player_y;
+
+	int		player_x;
+	int		player_y;
+
+	int		pixel_x;
+	int		pixel_y;
+
+	char	**map = g->vars->p_data.matrix;
+
+	start_player_x = g->player.pos_x * CUBE_SIZE;
+	start_player_y = g->player.pos_y * CUBE_SIZE;
+	player_y = 0;
+	while (player_y < PLAYER_SIZE)
+	{
+		player_x = 0;
+		while (player_x < PLAYER_SIZE)
+		{
+			pixel_x = start_player_x + player_x - PLAYER_SIZE / 2;
+			pixel_y = start_player_y + player_y - PLAYER_SIZE / 2;
+			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
+			g->img.data[index] = PLAYER_COLOR;
+			player_x++;
+		}
+		player_y++;
+	}
+}
+
+void	render_map(t_game *g)
+{
+	// char **map line coordinates
+	int	map_x;
+	int	map_y;
+	// mlx window pixels coordinates
+	int	pixel_x;
+	int	pixel_y;
+	// coordinates of the cube currently being drawn in the two last while loops
+	int	cube_x;
+	int	cube_y;
+	// coordinates of the first pixel in the cube to draw in each loop
+	int	start_cube_x;
+	int	start_cube_y;
+	// index needed to know where to change the pixels in the mlx img int *data array
+	int	index;
+	// parsed char **map from the parsing part
+	char	**map;
+
+	map_y = 0;
+	map = g->vars->p_data.matrix;
+	// looping through the char **map first
+	while (map[map_y])
+	{
+		map_x = 0;
+		while (map[map_y][map_x])
+		{
+			// check if the current char in char **map is '1'
+			if (map[map_y][map_x] == '1')
+			{
+				// calculate the position from which we should start drawing the cube
+				start_cube_x = map_x * CUBE_SIZE; 
+				start_cube_y = map_y * CUBE_SIZE;
+				// loop through the cube coordinates
+				cube_y = 0;
+				while (cube_y < CUBE_SIZE)
+				{
+					cube_x = 0;
+					while (cube_x < CUBE_SIZE)
+					{
+						// calculate the current cube coordinates reached
+						pixel_x = start_cube_x + cube_x;
+						pixel_y = start_cube_y + cube_y;
+						// convert 2d coordinates to 1d coordinate
+						index = pixel_y * (g->img.line_len / 4) + pixel_x;
+						g->img.data[index] = WHITE;
+						cube_x++;
+					}
+					cube_y++;
+				}
+			}
+			map_x++;
+		}
+		map_y++;
+	}
+}
+
+int	render(t_game *g)
+{
+	int	i;
+
+	i = 0;
+	while (i <= g->win_h * g->win_w)
+	{
+		g->img.data[i++] = BLACK;
+	}
+	render_map(g);
+	render_player(g);
+	//printf("player = [%f, %f]\n", g->player.pos_x, g->player.pos_y);
+	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
+}
+
+void	cube_init(t_vars *vars)
+{
+	t_game	*g = gc_malloc(sizeof(t_game));
+
+	g->vars = vars;
+	g->win_w = 800;
+	g->win_h = 600;
+	g->player.pos_x = (double) g->vars->p_data.p_x;
+	g->player.pos_y = (double) g->vars->p_data.p_y;
+	vars->mlx = mlx_init();
+	vars->win = mlx_new_window(vars->mlx, 800, 600, "Dungeon gayme");
+	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);
+	g->img.data = (int *)mlx_get_data_addr(g->img.img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	mlx_loop_hook(g->vars->mlx, render, g);
+	mlx_hook(vars->win, 2, 1L<<0, controls, g);
+	mlx_loop(vars->mlx);
+	render(g);
 }
 
 int	main(int argc, char *argv[])
@@ -237,7 +423,8 @@ int	main(int argc, char *argv[])
 
 	while (map[i])
 		printf("[%s]\n", map[i++]);
-	init_game(&vars);
+	//init_game(&vars);
+	cube_init(&vars);
 	gc_free_all();
 	return (0);
 }
