@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/25 21:15:48 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/26 20:14:44 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,8 +220,11 @@ void	init_game(t_vars *vars)
 	mlx_loop(vars->mlx);
 }*/
 
+#define PI 3.14159
 #define CUBE_SIZE 64
+#define RAY_WIDTH 3
 #define PLAYER_SIZE 10
+#define ROT_SPEED 3
 #define MOVE_SPEED 0.1
 #define WHITE 0xFFFFFF
 #define BLACK 0x000000
@@ -276,12 +279,73 @@ int	controls(int keycode, t_game *g)
 {
 	if (keycode == 'w' && check_new_position(g->player.pos_x, g->player.pos_y - MOVE_SPEED, g, 'w'))
 		g->player.pos_y -= MOVE_SPEED;
-	if (keycode == 'd' && check_new_position(g->player.pos_x + MOVE_SPEED, g->player.pos_y, g, 'd'))
+	else if (keycode == 'd' && check_new_position(g->player.pos_x + MOVE_SPEED, g->player.pos_y, g, 'd'))
 		g->player.pos_x += MOVE_SPEED;
-	if (keycode == 's' && check_new_position(g->player.pos_x, g->player.pos_y + MOVE_SPEED, g, 's'))
+	else if (keycode == 's' && check_new_position(g->player.pos_x, g->player.pos_y + MOVE_SPEED, g, 's'))
 		g->player.pos_y += MOVE_SPEED;
-	if (keycode == 'a' && check_new_position(g->player.pos_x - MOVE_SPEED, g->player.pos_y, g, 'a'))
+	else if (keycode == 'a' && check_new_position(g->player.pos_x - MOVE_SPEED, g->player.pos_y, g, 'a'))
 		g->player.pos_x -= MOVE_SPEED;
+	else if (keycode == 65361 || keycode == 123) // left arrow
+		g->player.angle -= ROT_SPEED;
+	else if (keycode == 65363 || keycode == 124) // right arrow
+		g->player.angle += ROT_SPEED;
+}
+
+void	render_ray_points(int x, int y, t_game *g)
+{
+	int		start_x;
+	int		start_y;
+
+	int		player_x;
+	int		player_y;
+
+	int		pixel_x;
+	int		pixel_y;
+
+	start_x = x;
+	start_y = y;
+	player_y = 0;
+	while (player_y < RAY_WIDTH)
+	{
+		player_x = 0;
+		while (player_x < RAY_WIDTH)
+		{
+			pixel_x = start_x + player_x - RAY_WIDTH / 2;
+			pixel_y = start_y + player_y - RAY_WIDTH / 2;
+			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
+			g->img.data[index] = PLAYER_COLOR;
+			player_x++;
+		}
+		player_y++;
+	}
+}
+
+void	render_vision_ray(t_game *g)
+{
+	double	angle = g->player.angle * PI / 180;
+	int p_x = (int)(g->player.pos_x * CUBE_SIZE);
+	int	p_y = (int)(g->player.pos_y * CUBE_SIZE);
+	int	end_x = p_x + cos(angle) * 100;
+	int	end_y = p_y + sin(angle) * 100;
+	int	d_x = end_x - p_x;
+	int	d_y = end_y - p_y;
+	int	steps;
+
+	if (abs(d_x) > abs(d_y))
+		steps = abs(d_x);
+	else
+		steps = abs(d_y);
+
+	double	m = (double)d_y / d_x;
+	int i = 0;
+	while (i <= steps)
+	{
+		int	x = p_x + (i * d_x) / steps;
+		int	y = p_y + (i * d_y) / steps;
+		render_ray_points(x, y, g);
+		//mlx_pixel_put(g->vars->mlx, g->vars->win, p_x + i, p_y + i * m, PLAYER_COLOR);
+		i++;
+	}
 }
 
 void	render_player(t_game *g)
@@ -383,6 +447,7 @@ int	render(t_game *g)
 	}
 	render_map(g);
 	render_player(g);
+	render_vision_ray(g);
 	//printf("player = [%f, %f]\n", g->player.pos_x, g->player.pos_y);
 	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
 }
@@ -396,6 +461,7 @@ void	cube_init(t_vars *vars)
 	g->win_h = 600;
 	g->player.pos_x = (double) g->vars->p_data.p_x;
 	g->player.pos_y = (double) g->vars->p_data.p_y;
+	g->player.angle = 0;
 	vars->mlx = mlx_init();
 	vars->win = mlx_new_window(vars->mlx, 800, 600, "Dungeon gayme");
 	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);

@@ -32,3 +32,24 @@ void simple_render_map(int *image_data, int line_length, char **map, int map_hei
         }
     }
 }
+/
+void	render_vision_ray(t_game *g)
+{
+	double	angle = 350 * PI / 180;
+	int p_x = (int)(g->player.pos_x * CUBE_SIZE);
+	int	p_y = (int)(g->player.pos_y * CUBE_SIZE);
+	int	end_x = p_x + cos(angle) * 100;
+	int	end_y = p_y + sin(angle) * 100;
+	int		d_x = end_x - p_x;
+	int		d_y = end_y - p_y;
+
+	int steps = abs(d_x) > abs(d_y) ? abs(d_x) : abs(d_y);
+	
+	for (int i = 0; i <= steps; i++)
+	{
+		int x = p_x + (i * d_x) / steps;
+		int y = p_y + (i * d_y) / steps;
+		render_ray_points(x, y, g);
+	}
+}
+
