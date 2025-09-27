@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/26 20:14:44 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/27 11:40:07 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,45 +230,22 @@ void	init_game(t_vars *vars)
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
 
-/*int	check_new_position(double new_x, double new_y, t_game *g, int dir)
-{
-	float	cast_y;
-	float	cast_x;
-
-	cast_y = new_y;
-	cast_x = new_x;
-	if (dir == 'a' || dir == 'w')
-	{
-		if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)] == '1')
-			return (0);
-	}
-	else if (dir == 'd' || dir == 's')
-	{
-		if (g->vars->p_data.matrix[(int)(new_y + 0.1)][(int)(new_x + 0.1)] == '1')
-			return (0);
-	}
-	return (1);
-}*/
-
 int check_new_position(double new_x, double new_y, t_game *g, int dir)
 {
     double player_size_in_map = (double)PLAYER_SIZE / CUBE_SIZE;
     
     if (dir == 'a' || dir == 'w')
     {
-        // For left/up movement, check top-left corner
         if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)] == '1')
             return (0);
     }
     else if (dir == 'd')
     {
-        // For right movement, check top-right corner
         if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x + player_size_in_map)] == '1')
             return (0);
     }
     else if (dir == 's')
     {
-        // For down movement, check bottom-left corner
         if (g->vars->p_data.matrix[(int)(new_y + player_size_in_map)][(int)(new_x)] == '1')
             return (0);
     }
@@ -277,12 +254,31 @@ int check_new_position(double new_x, double new_y, t_game *g, int dir)
 
 int	controls(int keycode, t_game *g)
 {
-	if (keycode == 'w' && check_new_position(g->player.pos_x, g->player.pos_y - MOVE_SPEED, g, 'w'))
-		g->player.pos_y -= MOVE_SPEED;
+	double	angle = g->player.angle * PI / 180;
+	if (keycode == 'w')
+	{
+		double new_x = g->player.pos_x + cos(angle) * MOVE_SPEED;
+		double new_y = g->player.pos_y + sin(angle) * MOVE_SPEED;
+		if (check_new_position(new_x, new_y, g, 'w'))
+		{
+			g->player.pos_x = new_x;
+			g->player.pos_y = new_y;
+		}
+	}
+		//g->player.pos_y -= MOVE_SPEED;
 	else if (keycode == 'd' && check_new_position(g->player.pos_x + MOVE_SPEED, g->player.pos_y, g, 'd'))
 		g->player.pos_x += MOVE_SPEED;
-	else if (keycode == 's' && check_new_position(g->player.pos_x, g->player.pos_y + MOVE_SPEED, g, 's'))
-		g->player.pos_y += MOVE_SPEED;
+	else if (keycode == 's')
+	{
+		double new_x = g->player.pos_x + cos(angle) * (-MOVE_SPEED);
+		double new_y = g->player.pos_y + sin(angle) * (-MOVE_SPEED);
+		if (check_new_position(new_x, new_y, g, 's'))
+		{
+			g->player.pos_x = new_x;
+			g->player.pos_y = new_y;
+		}
+	}
+		//g->player.pos_y += MOVE_SPEED;
 	else if (keycode == 'a' && check_new_position(g->player.pos_x - MOVE_SPEED, g->player.pos_y, g, 'a'))
 		g->player.pos_x -= MOVE_SPEED;
 	else if (keycode == 65361 || keycode == 123) // left arrow
@@ -461,7 +457,8 @@ void	cube_init(t_vars *vars)
 	g->win_h = 600;
 	g->player.pos_x = (double) g->vars->p_data.p_x;
 	g->player.pos_y = (double) g->vars->p_data.p_y;
-	g->player.angle = 0;
+	printf("parsed player direction = [%f]\n", g->vars->p_data.angle);
+	g->player.angle = g->vars->p_data.angle;
 	vars->mlx = mlx_init();
 	vars->win = mlx_new_window(vars->mlx, 800, 600, "Dungeon gayme");
 	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);

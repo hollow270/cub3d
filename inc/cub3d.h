@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/26 19:59:41 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/27 10:15:37 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ typedef struct s_parse_data
 	t_map_line	*map_lines;
 	float		p_x;
 	float		p_y;
+	double		angle;
 }				t_parse_data;
 
 typedef struct s_vars
