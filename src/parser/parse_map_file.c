@@ -41,6 +41,7 @@ int	parse_map_file(char *file_name, t_parse_data *p_data)
 		return (close(fd), printf("Error\nMap is not enclosed in walls\n"), 0);
 	if (get_player_pos(p_data) == 0)
 		return (close(fd), printf("Error\nMore than one player in map/Invalid char found in map\n"), 0);
+	fill_map_space(p_data);
 	return (close(fd), 1);
 }
 

@@ -6,219 +6,13 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/27 11:40:07 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/27 17:32:44 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
 
 int	check_extension(char *file_name);
-
-/*#define MOVE_SPEED 0.1
-#define ROT_SPEED 0.05
-
-static void	init_player(t_game *g, char **map)
-{
-	int y = 0;
-	while (map[y])
-	{
-		int x = 0;
-		while (map[y][x])
-		{
-			if (map[y][x] == 'N' || map[y][x] == 'S'
-				|| map[y][x] == 'E' || map[y][x] == 'W')
-			{
-				g->player.pos_x = x + 0.5;
-				g->player.pos_y = y + 0.5;
-				if (map[y][x] == 'N')
-				{
-					g->player.dir_x = 0; g->player.dir_y = -1;
-					g->player.plane_x = 0.66; g->player.plane_y = 0;
-				}
-				else if (map[y][x] == 'S')
-				{
-					g->player.dir_x = 0; g->player.dir_y = 1;
-					g->player.plane_x = -0.66; g->player.plane_y = 0;
-				}
-				else if (map[y][x] == 'E')
-				{
-					g->player.dir_x = 1; g->player.dir_y = 0;
-					g->player.plane_x = 0; g->player.plane_y = 0.66;
-				}
-				else if (map[y][x] == 'W')
-				{
-					g->player.dir_x = -1; g->player.dir_y = 0;
-					g->player.plane_x = 0; g->player.plane_y = -0.66;
-				}
-				return ;
-			}
-			x++;
-		}
-		y++;
-	}
-}
-
-static void	put_pixel(t_img *img, int x, int y, int color)
-{
-	if (x >= 0 && x < 800 && y >= 0 && y < 600)
-		img->data[y * (img->line_len / 4) + x] = color;
-}
-
-static void	render_frame(t_game *g)
-{
-	int x;
-
-	for (x = 0; x < g->win_w; x++)
-	{
-		double cameraX = 2 * x / (double)g->win_w - 1;
-		double rayDirX = g->player.dir_x + g->player.plane_x * cameraX;
-		double rayDirY = g->player.dir_y + g->player.plane_y * cameraX;
-
-		int mapX = (int)g->player.pos_x;
-		int mapY = (int)g->player.pos_y;
-
-		double sideDistX, sideDistY;
-		double deltaDistX = (rayDirX == 0) ? 1e30 : fabs(1 / rayDirX);
-		double deltaDistY = (rayDirY == 0) ? 1e30 : fabs(1 / rayDirY);
-		double perpWallDist;
-		int stepX, stepY, hit = 0, side;
-
-		if (rayDirX < 0) { stepX = -1; sideDistX = (g->player.pos_x - mapX) * deltaDistX; }
-		else { stepX = 1; sideDistX = (mapX + 1.0 - g->player.pos_x) * deltaDistX; }
-		if (rayDirY < 0) { stepY = -1; sideDistY = (g->player.pos_y - mapY) * deltaDistY; }
-		else { stepY = 1; sideDistY = (mapY + 1.0 - g->player.pos_y) * deltaDistY; }
-
-		while (hit == 0)
-		{
-			if (sideDistX < sideDistY) { sideDistX += deltaDistX; mapX += stepX; side = 0; }
-			else { sideDistY += deltaDistY; mapY += stepY; side = 1; }
-			if (g->vars->p_data.matrix[mapY][mapX] == '1') hit = 1;
-		}
-
-		if (side == 0) perpWallDist = (mapX - g->player.pos_x + (1 - stepX) / 2) / rayDirX;
-		else perpWallDist = (mapY - g->player.pos_y + (1 - stepY) / 2) / rayDirY;
-
-		int lineHeight = (int)(g->win_h / perpWallDist);
-		int drawStart = -lineHeight / 2 + g->win_h / 2;
-		if (drawStart < 0) drawStart = 0;
-		int drawEnd = lineHeight / 2 + g->win_h / 2;
-		if (drawEnd >= g->win_h) drawEnd = g->win_h - 1;
-
-		int color = (side == 0) ? 0xFF0000 : 0x880000;
-		for (int y = drawStart; y < drawEnd; y++)
-			put_pixel(&g->img, x, y, color);
-	}
-}
-
-static int	handle_key(int keycode, t_game *g)
-{
-	if (keycode == 65307) // ESC
-	{
-		mlx_destroy_window(g->vars->mlx, g->vars->win);
-		exit(0);
-	}
-	else if (keycode == 'w') // forward
-	{
-		int nx = (int)(g->player.pos_x + g->player.dir_x * MOVE_SPEED);
-		int ny = (int)(g->player.pos_y + g->player.dir_y * MOVE_SPEED);
-		if (g->vars->p_data.matrix[(int)g->player.pos_y][nx] != '1')
-			g->player.pos_x += g->player.dir_x * MOVE_SPEED;
-		if (g->vars->p_data.matrix[ny][(int)g->player.pos_x] != '1')
-			g->player.pos_y += g->player.dir_y * MOVE_SPEED;
-	}
-	else if (keycode == 's') // backward
-	{
-		int nx = (int)(g->player.pos_x - g->player.dir_x * MOVE_SPEED);
-		int ny = (int)(g->player.pos_y - g->player.dir_y * MOVE_SPEED);
-		if (g->vars->p_data.matrix[(int)g->player.pos_y][nx] != '1')
-			g->player.pos_x -= g->player.dir_x * MOVE_SPEED;
-		if (g->vars->p_data.matrix[ny][(int)g->player.pos_x] != '1')
-			g->player.pos_y -= g->player.dir_y * MOVE_SPEED;
-	}
-	else if (keycode == 'a') // strafe left
-	{
-		double strafe_x = g->player.dir_y;  // Fixed: was -g->player.dir_y
-		double strafe_y = -g->player.dir_x; // Fixed: was g->player.dir_x
-		int nx = (int)(g->player.pos_x + strafe_x * MOVE_SPEED);
-		int ny = (int)(g->player.pos_y + strafe_y * MOVE_SPEED);
-		if (g->vars->p_data.matrix[(int)g->player.pos_y][nx] != '1')
-			g->player.pos_x += strafe_x * MOVE_SPEED;
-		if (g->vars->p_data.matrix[ny][(int)g->player.pos_x] != '1')
-			g->player.pos_y += strafe_y * MOVE_SPEED;
-	}
-	else if (keycode == 'd') // strafe right
-	{
-		double strafe_x = -g->player.dir_y; // Fixed: was g->player.dir_y
-		double strafe_y = g->player.dir_x;  // Fixed: was -g->player.dir_x
-		int nx = (int)(g->player.pos_x + strafe_x * MOVE_SPEED);
-		int ny = (int)(g->player.pos_y + strafe_y * MOVE_SPEED);
-		if (g->vars->p_data.matrix[(int)g->player.pos_y][nx] != '1')
-			g->player.pos_x += strafe_x * MOVE_SPEED;
-		if (g->vars->p_data.matrix[ny][(int)g->player.pos_x] != '1')
-			g->player.pos_y += strafe_y * MOVE_SPEED;
-	}
-	else if (keycode == 65361 || keycode == 123) // left arrow
-	{
-		double oldDirX = g->player.dir_x;
-		g->player.dir_x = g->player.dir_x * cos(-ROT_SPEED) - g->player.dir_y * sin(-ROT_SPEED); // Fixed: negated ROT_SPEED
-		g->player.dir_y = oldDirX * sin(-ROT_SPEED) + g->player.dir_y * cos(-ROT_SPEED);        // Fixed: negated ROT_SPEED
-		double oldPlaneX = g->player.plane_x;
-		g->player.plane_x = g->player.plane_x * cos(-ROT_SPEED) - g->player.plane_y * sin(-ROT_SPEED); // Fixed: negated ROT_SPEED
-		g->player.plane_y = oldPlaneX * sin(-ROT_SPEED) + g->player.plane_y * cos(-ROT_SPEED);         // Fixed: negated ROT_SPEED
-	}
-	else if (keycode == 65363 || keycode == 124) // right arrow
-	{
-		double oldDirX = g->player.dir_x;
-		g->player.dir_x = g->player.dir_x * cos(ROT_SPEED) - g->player.dir_y * sin(ROT_SPEED); // Fixed: removed negation
-		g->player.dir_y = oldDirX * sin(ROT_SPEED) + g->player.dir_y * cos(ROT_SPEED);        // Fixed: removed negation
-		double oldPlaneX = g->player.plane_x;
-		g->player.plane_x = g->player.plane_x * cos(ROT_SPEED) - g->player.plane_y * sin(ROT_SPEED); // Fixed: removed negation
-		g->player.plane_y = oldPlaneX * sin(ROT_SPEED) + g->player.plane_y * cos(ROT_SPEED);         // Fixed: removed negation
-	}
-	return (0);
-}
-
-static int	handle_close(t_game *g)
-{
-	mlx_destroy_window(g->vars->mlx, g->vars->win);
-	exit(0);
-	return (0);
-}
-
-static int	loop_hook(t_game *g)
-{
-	for (int i = 0; i < g->win_w * (g->win_h / 2); i++)
-		g->img.data[i] = 0x87CEEB; // sky color
-	for (int i = g->win_w * (g->win_h / 2); i < g->win_w * g->win_h; i++)
-		g->img.data[i] = 0x8B4513; // sky color
-
-	render_frame(g);
-	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
-	return (0);
-}
-
-void	init_game(t_vars *vars)
-{
-	t_game *g = gc_malloc(sizeof(t_game));
-
-	g->vars = vars;
-	g->win_w = 800;
-	g->win_h = 600;
-
-	init_player(g, vars->p_data.matrix);
-
-	vars->mlx = mlx_init();
-	vars->win = mlx_new_window(vars->mlx, g->win_w, g->win_h, "Cub3D");
-	g->img.img = mlx_new_image(vars->mlx, g->win_w, g->win_h);
-	g->img.data = (int *)mlx_get_data_addr(g->img.img,
-			&g->img.bpp, &g->img.line_len, &g->img.endian);
-
-	mlx_loop_hook(vars->mlx, loop_hook, g);
-	mlx_hook(vars->win, 2, 1L<<0, handle_key, g);   // key press
-	mlx_hook(vars->win, 17, 0, handle_close, g);    // close window
-
-	mlx_loop(vars->mlx);
-}*/
 
 #define PI 3.14159
 #define CUBE_SIZE 64
@@ -281,10 +75,22 @@ int	controls(int keycode, t_game *g)
 		//g->player.pos_y += MOVE_SPEED;
 	else if (keycode == 'a' && check_new_position(g->player.pos_x - MOVE_SPEED, g->player.pos_y, g, 'a'))
 		g->player.pos_x -= MOVE_SPEED;
-	else if (keycode == 65361 || keycode == 123) // left arrow
+	/*else if (keycode == 65361 || keycode == 123) // left arrow
 		g->player.angle -= ROT_SPEED;
 	else if (keycode == 65363 || keycode == 124) // right arrow
+		g->player.angle += ROT_SPEED;*/
+	if (keycode == 65361 || keycode == 123)
+	{
+		g->player.angle -= ROT_SPEED;
+		if (g->player.angle < 0)
+			g->player.angle += 360;
+	}
+	else if (keycode == 65363 || keycode == 124)
+	{
 		g->player.angle += ROT_SPEED;
+		if (g->player.angle >= 360)
+			g->player.angle -= 360;
+	}
 }
 
 void	render_ray_points(int x, int y, t_game *g)
@@ -316,30 +122,219 @@ void	render_ray_points(int x, int y, t_game *g)
 	}
 }
 
+int	is_wall(t_game *g, double x, double y)
+{
+	char	**map;
+	int		map_x;
+	int		map_y;
+	int		width;
+	int		height;
+
+	map_x = (int)x / 64;
+	map_y = (int)y / 64;
+	width = g->vars->p_data.width;
+	height = g->vars->p_data.height;
+	if (map_x < 0 || map_x >= width || map_y < 0 || map_y >= height)
+		return (1);
+	map = g->vars->p_data.matrix;
+	//if (map[(int)(y / 64)][(int)(x / 64)] == '1')
+	if (map[map_y][map_x] == '1')
+		return (1);
+	return (0);
+}
+
+void	init_raycast_data(t_game *g)
+{
+	g->rcd = gc_malloc(sizeof(t_raycast));
+	g->rcd->p_p = gc_malloc(sizeof(t_pos));
+	g->rcd->p_p->x = g->player.pos_x * 64;
+	g->rcd->p_p->y = g->player.pos_y * 64;
+	g->rcd->angle = g->player.angle * PI / 180;
+	g->rcd->h_p = gc_malloc(sizeof(t_pos));
+	g->rcd->v_p = gc_malloc(sizeof(t_pos));
+	g->rcd->tip_p = gc_malloc(sizeof(t_pos));
+	g->rcd->tip_p->x = 0;
+	g->rcd->tip_p->y = 0;
+}
+
+void	get_horizontal_intercept(t_game *g)
+{
+	double	x_step;
+	double	y_step;
+	int		max_i;
+
+	// Check for rays parallel to horizontal lines (pointing left or right)
+	if (fabs(sin(g->rcd->angle)) < 0.0001)
+	{
+		g->rcd->h_p->x = g->rcd->p_p->x;
+		g->rcd->h_p->y = g->rcd->p_p->y;
+		return;
+	}
+
+	// Determine direction and initial intersection
+	if (g->rcd->angle > 0 && g->rcd->angle < PI)  // Ray pointing up
+	{
+		g->rcd->h_p->y = floor(g->rcd->p_p->y / 64) * 64;
+		y_step = -64;
+	}
+	else  // Ray pointing down
+	{
+		g->rcd->h_p->y = ceil(g->rcd->p_p->y / 64) * 64;
+		y_step = 64;
+	}
+	
+	g->rcd->h_p->x = g->rcd->p_p->x + ((g->rcd->h_p->y - g->rcd->p_p->y) / tan(g->rcd->angle));
+	x_step = y_step / tan(g->rcd->angle);
+	
+	max_i = 100;
+	while (max_i != 0)
+	{
+		// Check the cell we're entering based on direction
+		double check_y = g->rcd->h_p->y;
+		if (y_step < 0)  // Going up, check cell above the line
+			check_y -= 1;
+		
+		if (is_wall(g, g->rcd->h_p->x, check_y))
+			break;
+		
+		g->rcd->h_p->x += x_step;
+		g->rcd->h_p->y += y_step;
+		max_i--;
+	}
+	//printf("h_intercept = [%f, %f]\n", g->rcd->h_p->x, g->rcd->h_p->y);
+}
+
+void	get_vertical_intercept(t_game *g)
+{
+	double	x_step;
+	double	y_step;
+	int		max_i;
+
+	// Special case: ray pointing straight up or down
+	if (fabs(cos(g->rcd->angle)) < 0.0001)
+	{
+		g->rcd->v_p->x = g->rcd->p_p->x;
+		g->rcd->v_p->y = g->rcd->p_p->y;
+		return;
+	}
+
+	// Determine direction and initial intersection
+	if (cos(g->rcd->angle) > 0)  // Ray pointing right
+	{
+		g->rcd->v_p->x = ceil(g->rcd->p_p->x / 64) * 64;
+		x_step = 64;
+	}
+	else  // Ray pointing left
+	{
+		g->rcd->v_p->x = floor(g->rcd->p_p->x / 64) * 64;
+		x_step = -64;
+	}
+	
+	g->rcd->v_p->y = g->rcd->p_p->y + ((g->rcd->v_p->x - g->rcd->p_p->x) * tan(g->rcd->angle));
+	y_step = x_step * tan(g->rcd->angle);
+	
+	max_i = 100;
+	while (max_i != 0)
+	{
+		// Check the cell we're entering based on direction
+		double check_x = g->rcd->v_p->x;
+		if (x_step < 0)  // Going left, check cell to the left of the line
+			check_x -= 1;
+		
+		if (is_wall(g, check_x, g->rcd->v_p->y))
+			break;
+		
+		g->rcd->v_p->x += x_step;
+		g->rcd->v_p->y += y_step;
+		max_i--;
+	}
+	//printf("v_intercept = [%f, %f]\n", g->rcd->v_p->x, g->rcd->v_p->y);
+}
+
+void	choose_ray_tip(t_game *g)
+{
+	double	h_dist;
+	double	v_dist;
+
+	h_dist = sqrt(((g->rcd->h_p->x - g->rcd->p_p->x) * (g->rcd->h_p->x - g->rcd->p_p->x)) + ((g->rcd->h_p->y - g->rcd->p_p->y) * (g->rcd->h_p->y - g->rcd->p_p->y)));
+	v_dist = sqrt(((g->rcd->v_p->x - g->rcd->p_p->x) * (g->rcd->v_p->x - g->rcd->p_p->x)) + ((g->rcd->v_p->y - g->rcd->p_p->y) * (g->rcd->v_p->y - g->rcd->p_p->y)));
+	if (h_dist < v_dist)
+	{
+		if (h_dist == 0)
+		{	
+			g->rcd->tip_p->x = g->rcd->v_p->x;
+			g->rcd->tip_p->y = g->rcd->v_p->y;
+			return ;
+		}
+		g->rcd->tip_p->x = g->rcd->h_p->x;
+		g->rcd->tip_p->y = g->rcd->h_p->y;
+	}
+	else
+	{
+		if (v_dist == 0)
+		{
+			g->rcd->tip_p->x = g->rcd->h_p->x;
+			g->rcd->tip_p->y = g->rcd->h_p->y;
+			return ;
+		}
+		g->rcd->tip_p->x = g->rcd->v_p->x;
+		g->rcd->tip_p->y = g->rcd->v_p->y;
+	}
+}
+
 void	render_vision_ray(t_game *g)
 {
-	double	angle = g->player.angle * PI / 180;
-	int p_x = (int)(g->player.pos_x * CUBE_SIZE);
-	int	p_y = (int)(g->player.pos_y * CUBE_SIZE);
-	int	end_x = p_x + cos(angle) * 100;
-	int	end_y = p_y + sin(angle) * 100;
-	int	d_x = end_x - p_x;
-	int	d_y = end_y - p_y;
-	int	steps;
+	int		d_x;
+	int		d_y;
+	int		steps;
+	int		i;
 
+	init_raycast_data(g);
+	if (g->vars->p_data.matrix[(int)g->vars->p_data.p_y][(int)g->vars->p_data.p_x] == 'N'
+		|| g->vars->p_data.matrix[(int)g->vars->p_data.p_y][(int)g->vars->p_data.p_x] == 'S')
+	{
+		get_horizontal_intercept(g);
+		get_vertical_intercept(g);
+	}
+	else
+	{
+		get_vertical_intercept(g);
+		get_horizontal_intercept(g);
+	}
+	if (g->rcd->h_p->x < 0)
+		g->rcd->h_p->x = g->win_w * CUBE_SIZE;
+	if (g->rcd->h_p->y < 0)
+		g->rcd->h_p->y = g->win_h * CUBE_SIZE;
+	if (g->rcd->v_p->x < 0)
+		g->rcd->v_p->x = g->win_w * CUBE_SIZE;
+	if (g->rcd->v_p->y < 0)
+		g->rcd->v_p->y = g->win_h * CUBE_SIZE;
+	choose_ray_tip(g);
+	if (g->rcd->tip_p->y < 0)
+		g->rcd->tip_p->y = 64;
+	else if (g->rcd->tip_p->x < 0)
+		g->rcd->tip_p->x = 64;
+	else if (g->rcd->tip_p->y > g->win_h)
+		g->rcd->tip_p->y = g->win_h - 64;
+	else if (g->rcd->tip_p->x > g->win_w)
+		g->rcd->tip_p->x = g->win_w - 64;
+	printf("chosen tip = [%f, %f]\n", g->rcd->tip_p->x, g->rcd->tip_p->y);
+	printf("angle = [%f]\n", g->rcd->angle);
+	//get_horizontal_intercept(g);
+	//get_vertical_intercept(g);
+	//render_ray_points(g->rcd->h_p->x, g->rcd->h_p->y, g);
+	d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
+	d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
 	if (abs(d_x) > abs(d_y))
 		steps = abs(d_x);
 	else
 		steps = abs(d_y);
-
-	double	m = (double)d_y / d_x;
-	int i = 0;
-	while (i <= steps)
+	i = 0;
+	while (i <= steps && steps != 0)
 	{
-		int	x = p_x + (i * d_x) / steps;
-		int	y = p_y + (i * d_y) / steps;
-		render_ray_points(x, y, g);
-		//mlx_pixel_put(g->vars->mlx, g->vars->win, p_x + i, p_y + i * m, PLAYER_COLOR);
+		int	tmp_x = g->rcd->p_p->x + (i * d_x) / steps;
+		int	tmp_y = g->rcd->p_p->y + (i * d_y) / steps;
+		render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, g->rcd->p_p->y + (i * d_y) / steps, g);
 		i++;
 	}
 }
@@ -453,14 +448,15 @@ void	cube_init(t_vars *vars)
 	t_game	*g = gc_malloc(sizeof(t_game));
 
 	g->vars = vars;
-	g->win_w = 800;
-	g->win_h = 600;
+	g->win_w = vars->p_data.width * 64;
+	g->win_h = vars->p_data.height * 64;
+	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
 	g->player.pos_x = (double) g->vars->p_data.p_x;
 	g->player.pos_y = (double) g->vars->p_data.p_y;
 	printf("parsed player direction = [%f]\n", g->vars->p_data.angle);
 	g->player.angle = g->vars->p_data.angle;
 	vars->mlx = mlx_init();
-	vars->win = mlx_new_window(vars->mlx, 800, 600, "Dungeon gayme");
+	vars->win = mlx_new_window(vars->mlx, g->win_w, g->win_h, "Dungeon gayme");
 	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);
 	g->img.data = (int *)mlx_get_data_addr(g->img.img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	mlx_loop_hook(g->vars->mlx, render, g);
@@ -486,7 +482,6 @@ int	main(int argc, char *argv[])
 
 	while (map[i])
 		printf("[%s]\n", map[i++]);
-	//init_game(&vars);
 	cube_init(&vars);
 	gc_free_all();
 	return (0);

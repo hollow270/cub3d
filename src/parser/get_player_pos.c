@@ -66,7 +66,7 @@ int	check_map_chars(t_parse_data *p_data)
 		while (map[y][x])
 		{
 			if (is_valid_char(map[y][x]) == 0)
-				return (0);
+				return (printf("culprit = %c\n", map[y][x]), 0);
 			x++;
 		}
 		y++;
@@ -77,7 +77,8 @@ int	check_map_chars(t_parse_data *p_data)
 int	is_valid_char(int c)
 {
 	return (c == '1' || c == '0' || c == 'N'
-			|| c == 'E' || c == 'S' || c == 'W');
+			|| c == 'E' || c == 'S' || c == 'W'
+			|| c == ' ');
 }
 
 int	is_player(int c)
@@ -89,12 +90,12 @@ int	is_player(int c)
 double	get_player_direction(int c)
 {
 	if (c == 'N')
-		return ((double)90 + 180);
+		return ((double)90) + 180;// + 180);
 	if (c == 'E')
-		return ((double)0 + 180);
+		return ((double)0);// + 180);
 	if (c == 'S')
-		return ((double)270 + 180);
+		return ((double)270 - 180);// + 180);
 	if (c == 'W')
-		return ((double)180 + 180);
+		return ((double)180);// + 180);
 	return (-1);
 }

@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/27 10:15:37 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/09/27 17:42:34 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ typedef struct s_parse_data
 	float		p_x;
 	float		p_y;
 	double		angle;
+	int			height;
+	int			width;
 }				t_parse_data;
 
 typedef struct s_vars
@@ -69,6 +71,21 @@ typedef struct s_vars
 	t_parse_data	p_data;
 	t_sprites		*sprites;
 }					t_vars;
+
+typedef struct s_pos
+{
+	double	x;
+	double	y;
+}			t_pos;
+
+typedef struct s_raycast
+{
+	double	angle;
+	t_pos	*h_p;
+	t_pos	*v_p;
+	t_pos	*p_p;
+	t_pos	*tip_p;
+}			t_raycast;
 
 typedef struct s_garbage
 {
@@ -85,6 +102,8 @@ typedef struct s_player
 	double	plane_x;
 	double	plane_y;
 	double	angle;
+	int		x_step;
+	int		y_step;
 }	t_player;
 
 typedef struct s_img
@@ -99,6 +118,7 @@ typedef struct s_img
 typedef struct s_game
 {
 	t_vars		*vars;
+	t_raycast	*rcd;
 	t_player	player;
 	t_img		img;
 	int			win_w;
@@ -146,6 +166,7 @@ char		**extract_map(t_parse_data *p_data);
 int			is_map(char *s);
 int			check_enclosed(t_parse_data *p_data);
 int			get_player_pos(t_parse_data *p_data);
+void		fill_map_space(t_parse_data *p_data);
 int			ft_strcmp(const char *s1, const char *s2);
 char		*ft_strchr(const char *s, int c);
 char		**ft_split(const char *s, char c);

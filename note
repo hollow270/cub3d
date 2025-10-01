@@ -1,0 +1,28 @@
+void	render_vision_ray(t_game *g)
+{
+	double	angle = g->player.angle * PI / 180;
+	int p_x = (int)(g->player.pos_x * CUBE_SIZE);
+	int	p_y = (int)(g->player.pos_y * CUBE_SIZE);
+	int	end_x = p_x + cos(angle) * 100;
+	int	end_y = p_y + sin(angle) * 100;
+	int	d_x = end_x - p_x;
+	int	d_y = end_y - p_y;
+	int	steps;
+
+	if (abs(d_x) > abs(d_y))
+		steps = abs(d_x);
+	else
+		steps = abs(d_y);
+
+	double	m = (double)d_y / d_x;
+	int i = 0;
+	while (i <= steps)
+	{
+		int	x = p_x + (i * d_x) / steps;
+		int	y = p_y + (i * d_y) / steps;
+		render_ray_points(x, y, g);
+		//mlx_pixel_put(g->vars->mlx, g->vars->win, p_x + i, p_y + i * m, PLAYER_COLOR);
+		i++;
+	}
+}
+
