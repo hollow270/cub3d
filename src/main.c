@@ -93,7 +93,7 @@ int	controls(int keycode, t_game *g)
 	}
 }
 
-void	render_ray_points(int x, int y, t_game *g)
+void	render_ray_points(int x, int y, t_game *g, int color)
 {
 	int		start_x;
 	int		start_y;
@@ -115,7 +115,7 @@ void	render_ray_points(int x, int y, t_game *g)
 			pixel_x = start_x + player_x - RAY_WIDTH / 2;
 			pixel_y = start_y + player_y - RAY_WIDTH / 2;
 			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
-			g->img.data[index] = PLAYER_COLOR;
+			g->img.data[index] = color;
 			player_x++;
 		}
 		player_y++;
@@ -163,7 +163,6 @@ void	get_horizontal_intercept(t_game *g)
 	double	y_step;
 	int		max_i;
 
-	// Check for rays parallel to horizontal lines (pointing left or right)
 	if (fabs(sin(g->rcd->angle)) < 0.0001)
 	{
 		g->rcd->h_p->x = g->rcd->p_p->x;
@@ -171,15 +170,21 @@ void	get_horizontal_intercept(t_game *g)
 		return;
 	}
 
-	// Determine direction and initial intersection
-	if (g->rcd->angle > 0 && g->rcd->angle < PI)  // Ray pointing up
+	// Ray pointing up (270° direction, angle > 180 in screen coords)
+	if (g->rcd->angle > PI)
 	{
 		g->rcd->h_p->y = floor(g->rcd->p_p->y / 64) * 64;
+		// If exactly on grid line, move one step back
+		if (g->rcd->h_p->y == g->rcd->p_p->y)
+			g->rcd->h_p->y -= 64;
 		y_step = -64;
 	}
-	else  // Ray pointing down
+	else  // Ray pointing down (90° direction)
 	{
 		g->rcd->h_p->y = ceil(g->rcd->p_p->y / 64) * 64;
+		// If exactly on grid line, move one step forward
+		if (g->rcd->h_p->y == g->rcd->p_p->y)
+			g->rcd->h_p->y += 64;
 		y_step = 64;
 	}
 	
@@ -189,9 +194,8 @@ void	get_horizontal_intercept(t_game *g)
 	max_i = 100;
 	while (max_i != 0)
 	{
-		// Check the cell we're entering based on direction
 		double check_y = g->rcd->h_p->y;
-		if (y_step < 0)  // Going up, check cell above the line
+		if (y_step < 0)
 			check_y -= 1;
 		
 		if (is_wall(g, g->rcd->h_p->x, check_y))
@@ -201,7 +205,6 @@ void	get_horizontal_intercept(t_game *g)
 		g->rcd->h_p->y += y_step;
 		max_i--;
 	}
-	//printf("h_intercept = [%f, %f]\n", g->rcd->h_p->x, g->rcd->h_p->y);
 }
 
 void	get_vertical_intercept(t_game *g)
@@ -210,7 +213,6 @@ void	get_vertical_intercept(t_game *g)
 	double	y_step;
 	int		max_i;
 
-	// Special case: ray pointing straight up or down
 	if (fabs(cos(g->rcd->angle)) < 0.0001)
 	{
 		g->rcd->v_p->x = g->rcd->p_p->x;
@@ -218,15 +220,21 @@ void	get_vertical_intercept(t_game *g)
 		return;
 	}
 
-	// Determine direction and initial intersection
-	if (cos(g->rcd->angle) > 0)  // Ray pointing right
+	// Ray pointing right (0° direction)
+	if (cos(g->rcd->angle) > 0)
 	{
 		g->rcd->v_p->x = ceil(g->rcd->p_p->x / 64) * 64;
+		// If exactly on grid line, move one step forward
+		if (g->rcd->v_p->x == g->rcd->p_p->x)
+			g->rcd->v_p->x += 64;
 		x_step = 64;
 	}
-	else  // Ray pointing left
+	else  // Ray pointing left (180° direction)
 	{
 		g->rcd->v_p->x = floor(g->rcd->p_p->x / 64) * 64;
+		// If exactly on grid line, move one step back
+		if (g->rcd->v_p->x == g->rcd->p_p->x)
+			g->rcd->v_p->x -= 64;
 		x_step = -64;
 	}
 	
@@ -236,9 +244,8 @@ void	get_vertical_intercept(t_game *g)
 	max_i = 100;
 	while (max_i != 0)
 	{
-		// Check the cell we're entering based on direction
 		double check_x = g->rcd->v_p->x;
-		if (x_step < 0)  // Going left, check cell to the left of the line
+		if (x_step < 0)
 			check_x -= 1;
 		
 		if (is_wall(g, check_x, g->rcd->v_p->y))
@@ -248,10 +255,9 @@ void	get_vertical_intercept(t_game *g)
 		g->rcd->v_p->y += y_step;
 		max_i--;
 	}
-	//printf("v_intercept = [%f, %f]\n", g->rcd->v_p->x, g->rcd->v_p->y);
 }
 
-void	choose_ray_tip(t_game *g)
+/*void	choose_ray_tip(t_game *g)
 {
 	double	h_dist;
 	double	v_dist;
@@ -290,17 +296,8 @@ void	render_vision_ray(t_game *g)
 	int		i;
 
 	init_raycast_data(g);
-	if (g->vars->p_data.matrix[(int)g->vars->p_data.p_y][(int)g->vars->p_data.p_x] == 'N'
-		|| g->vars->p_data.matrix[(int)g->vars->p_data.p_y][(int)g->vars->p_data.p_x] == 'S')
-	{
-		get_horizontal_intercept(g);
-		get_vertical_intercept(g);
-	}
-	else
-	{
-		get_vertical_intercept(g);
-		get_horizontal_intercept(g);
-	}
+	get_horizontal_intercept(g);
+	get_vertical_intercept(g);
 	if (g->rcd->h_p->x < 0)
 		g->rcd->h_p->x = g->win_w * CUBE_SIZE;
 	if (g->rcd->h_p->y < 0)
@@ -320,8 +317,6 @@ void	render_vision_ray(t_game *g)
 		g->rcd->tip_p->x = g->win_w - 64;
 	printf("chosen tip = [%f, %f]\n", g->rcd->tip_p->x, g->rcd->tip_p->y);
 	printf("angle = [%f]\n", g->rcd->angle);
-	//get_horizontal_intercept(g);
-	//get_vertical_intercept(g);
 	//render_ray_points(g->rcd->h_p->x, g->rcd->h_p->y, g);
 	d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
 	d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
@@ -337,6 +332,107 @@ void	render_vision_ray(t_game *g)
 		render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, g->rcd->p_p->y + (i * d_y) / steps, g);
 		i++;
 	}
+}*/
+
+void	choose_ray_tip(t_game *g)
+{
+	double	h_dist;
+	double	v_dist;
+
+	h_dist = sqrt(((g->rcd->h_p->x - g->rcd->p_p->x) * (g->rcd->h_p->x - g->rcd->p_p->x)) + 
+	              ((g->rcd->h_p->y - g->rcd->p_p->y) * (g->rcd->h_p->y - g->rcd->p_p->y)));
+	v_dist = sqrt(((g->rcd->v_p->x - g->rcd->p_p->x) * (g->rcd->v_p->x - g->rcd->p_p->x)) + 
+	              ((g->rcd->v_p->y - g->rcd->p_p->y) * (g->rcd->v_p->y - g->rcd->p_p->y)));
+	if (h_dist == 0)
+	{
+		g->rcd->tip_p->x = g->rcd->v_p->x;
+		g->rcd->tip_p->y = g->rcd->v_p->y;
+		return ;
+	}
+	else if (v_dist == 0)
+	{
+		g->rcd->tip_p->x = g->rcd->h_p->x;
+		g->rcd->tip_p->y = g->rcd->h_p->y;
+		return ;
+	}
+	else if (h_dist <= v_dist)
+	{
+		g->rcd->tip_p->x = g->rcd->h_p->x;
+		g->rcd->tip_p->y = g->rcd->h_p->y;
+	}
+	else
+	{
+		g->rcd->tip_p->x = g->rcd->v_p->x;
+		g->rcd->tip_p->y = g->rcd->v_p->y;
+	}
+}
+
+void	render_point_debug(t_game *g, int x, int y, int color)
+{
+	int		start_player_x;
+	int		start_player_y;
+
+	int		player_x;
+	int		player_y;
+
+	int		pixel_x;
+	int		pixel_y;
+
+	start_player_x = x;
+	start_player_y = y;
+	if (x > g->win_w)
+		start_player_x = g->win_w;
+	else if (x < 0)
+		start_player_x = 0;
+	if (y > g->win_h)
+		start_player_y = g->win_h;
+	else if (y < 0)
+		start_player_y = 0;
+	player_y = 0;
+	while (player_y < PLAYER_SIZE)
+	{
+		player_x = 0;
+		while (player_x < PLAYER_SIZE)
+		{
+			pixel_x = start_player_x + player_x;
+			pixel_y = start_player_y + player_y;
+			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
+			g->img.data[index] = color;
+			player_x++;
+		}
+		player_y++;
+	}
+}
+
+void	render_vision_ray(t_game *g)
+{
+	int		d_x;
+	int		d_y;
+	int		steps;
+	int		i;
+
+	init_raycast_data(g);
+	get_horizontal_intercept(g);
+	get_vertical_intercept(g);
+	choose_ray_tip(g);
+	
+	d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
+	d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
+	
+	if (abs(d_x) > abs(d_y))
+		steps = abs(d_x);
+	else
+		steps = abs(d_y);
+	
+	i = 0;
+	while (i <= steps)
+	{
+		render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, 
+		                  g->rcd->p_p->y + (i * d_y) / steps, g, PLAYER_COLOR);
+		i++;
+	}
+	render_point_debug(g, g->rcd->h_p->x, g->rcd->h_p->y, 0x0000FF);
+	render_point_debug(g, g->rcd->v_p->x, g->rcd->v_p->y, 0x008000);
 }
 
 void	render_player(t_game *g)
