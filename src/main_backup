@@ -159,13 +159,13 @@ void	init_raycast_data(t_game *g)
 	g->rcd->tip_p->y = 0;
 }
 
-void	get_horizontal_intercept(t_game *g, double angle)
+void	get_horizontal_intercept(t_game *g)
 {
 	double	x_step;
 	double	y_step;
 	int		max_i;
 
-	if (fabs(sin(angle)) < 0.0001)
+	if (fabs(sin(g->rcd->angle)) < 0.0001)
 	{
 		g->rcd->h_p->x = g->rcd->p_p->x;
 		g->rcd->h_p->y = g->rcd->p_p->y;
@@ -173,7 +173,7 @@ void	get_horizontal_intercept(t_game *g, double angle)
 	}
 
 	// Ray pointing up (270° direction, angle > 180 in screen coords)
-	if (angle > PI)
+	if (g->rcd->angle > PI)
 	{
 		g->rcd->h_p->y = floor(g->rcd->p_p->y / 64) * 64;
 		// If exactly on grid line, move one step back
@@ -190,8 +190,8 @@ void	get_horizontal_intercept(t_game *g, double angle)
 		y_step = 64;
 	}
 	
-	g->rcd->h_p->x = g->rcd->p_p->x + ((g->rcd->h_p->y - g->rcd->p_p->y) / tan(angle));
-	x_step = y_step / tan(angle);
+	g->rcd->h_p->x = g->rcd->p_p->x + ((g->rcd->h_p->y - g->rcd->p_p->y) / tan(g->rcd->angle));
+	x_step = y_step / tan(g->rcd->angle);
 	
 	max_i = 100;
 	while (max_i != 0)
@@ -209,13 +209,13 @@ void	get_horizontal_intercept(t_game *g, double angle)
 	}
 }
 
-void	get_vertical_intercept(t_game *g, double angle)
+void	get_vertical_intercept(t_game *g)
 {
 	double	x_step;
 	double	y_step;
 	int		max_i;
 
-	if (fabs(cos(angle)) < 0.0001)
+	if (fabs(cos(g->rcd->angle)) < 0.0001)
 	{
 		g->rcd->v_p->x = g->rcd->p_p->x;
 		g->rcd->v_p->y = g->rcd->p_p->y;
@@ -223,7 +223,7 @@ void	get_vertical_intercept(t_game *g, double angle)
 	}
 
 	// Ray pointing right (0° direction)
-	if (cos(angle) > 0)
+	if (cos(g->rcd->angle) > 0)
 	{
 		g->rcd->v_p->x = ceil(g->rcd->p_p->x / 64) * 64;
 		// If exactly on grid line, move one step forward
@@ -240,8 +240,8 @@ void	get_vertical_intercept(t_game *g, double angle)
 		x_step = -64;
 	}
 	
-	g->rcd->v_p->y = g->rcd->p_p->y + ((g->rcd->v_p->x - g->rcd->p_p->x) * tan(angle));
-	y_step = x_step * tan(angle);
+	g->rcd->v_p->y = g->rcd->p_p->y + ((g->rcd->v_p->x - g->rcd->p_p->x) * tan(g->rcd->angle));
+	y_step = x_step * tan(g->rcd->angle);
 	
 	max_i = 100;
 	while (max_i != 0)
@@ -437,6 +437,7 @@ void	render_vision_ray(t_game *g)
 	double	*ray_angles;
 
 	ray_angles = gc_malloc(sizeof(double) * g->win_w);
+	init_ray_angles(g, ray_angles);
 	/*int	j = 0;
 	while (j < g->win_w)
 	{
@@ -444,34 +445,30 @@ void	render_vision_ray(t_game *g)
 		j++;
 	}
 	exit(0);*/
-	int	j = 0;
-	while (j < g->win_w)
+	init_raycast_data(g);
+	get_horizontal_intercept(g);
+	get_vertical_intercept(g);
+	//printf("h_intercept = [%f, %f]\nv_itercept[%f, %f]\n", g->rcd->h_p->x, g->rcd->h_p->y, g->rcd->v_p->x, g->rcd->v_p->y);
+	printf("player angle = [%f]\n", g->rcd->angle);
+	choose_ray_tip(g);
+	
+	d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
+	d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
+	
+	if (abs(d_x) > abs(d_y))
+		steps = abs(d_x);
+	else
+		steps = abs(d_y);
+	
+	i = 0;
+	while (i <= steps)
 	{
-		init_ray_angles(g, ray_angles);
-		init_raycast_data(g);
-		get_horizontal_intercept(g, ray_angles[j]);
-		get_vertical_intercept(g, ray_angles[j]);
-		choose_ray_tip(g);
-		
-		d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
-		d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
-		
-		if (abs(d_x) > abs(d_y))
-			steps = abs(d_x);
-		else
-			steps = abs(d_y);
-		
-		i = 0;
-		while (i <= steps)
-		{
-			render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, 
-							g->rcd->p_p->y + (i * d_y) / steps, g, PLAYER_COLOR);
-			i++;
-		}
-		//render_point_debug(g, g->rcd->h_p->x, g->rcd->h_p->y, 0x0000FF);
-		//render_point_debug(g, g->rcd->v_p->x, g->rcd->v_p->y, 0x008000);
-		j++;
+		render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, 
+		                  g->rcd->p_p->y + (i * d_y) / steps, g, PLAYER_COLOR);
+		i++;
 	}
+	render_point_debug(g, g->rcd->h_p->x, g->rcd->h_p->y, 0x0000FF);
+	render_point_debug(g, g->rcd->v_p->x, g->rcd->v_p->y, 0x008000);
 }
 
 void	render_player(t_game *g)

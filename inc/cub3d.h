@@ -81,6 +81,7 @@ typedef struct s_pos
 typedef struct s_raycast
 {
 	double	angle;
+	//double	**ray_angles;
 	t_pos	*h_p;
 	t_pos	*v_p;
 	t_pos	*p_p;
