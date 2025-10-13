@@ -86,6 +86,7 @@ typedef struct s_raycast
 	t_pos	*v_p;
 	t_pos	*p_p;
 	t_pos	*tip_p;
+	double	tip_dist;
 }			t_raycast;
 
 typedef struct s_garbage

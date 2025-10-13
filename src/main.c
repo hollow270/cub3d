@@ -24,6 +24,7 @@ int	check_extension(char *file_name);
 #define WHITE 0xFFFFFF
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
+#define PX_SIZE 5
 
 int check_new_position(double new_x, double new_y, t_game *g, int dir)
 {
@@ -115,8 +116,9 @@ void	render_ray_points(int x, int y, t_game *g, int color)
 		{
 			pixel_x = start_x + player_x - RAY_WIDTH / 2;
 			pixel_y = start_y + player_y - RAY_WIDTH / 2;
-			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
-			g->img.data[index] = color;
+			mlx_pixel_put(g->vars->mlx, g->vars->win, pixel_x, pixel_y, color);
+			//int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
+			//g->img.data[index] = color;
 			player_x++;
 		}
 		player_y++;
@@ -259,83 +261,6 @@ void	get_vertical_intercept(t_game *g, double angle)
 	}
 }
 
-/*void	choose_ray_tip(t_game *g)
-{
-	double	h_dist;
-	double	v_dist;
-
-	h_dist = sqrt(((g->rcd->h_p->x - g->rcd->p_p->x) * (g->rcd->h_p->x - g->rcd->p_p->x)) + ((g->rcd->h_p->y - g->rcd->p_p->y) * (g->rcd->h_p->y - g->rcd->p_p->y)));
-	v_dist = sqrt(((g->rcd->v_p->x - g->rcd->p_p->x) * (g->rcd->v_p->x - g->rcd->p_p->x)) + ((g->rcd->v_p->y - g->rcd->p_p->y) * (g->rcd->v_p->y - g->rcd->p_p->y)));
-	if (h_dist < v_dist)
-	{
-		if (h_dist == 0)
-		{	
-			g->rcd->tip_p->x = g->rcd->v_p->x;
-			g->rcd->tip_p->y = g->rcd->v_p->y;
-			return ;
-		}
-		g->rcd->tip_p->x = g->rcd->h_p->x;
-		g->rcd->tip_p->y = g->rcd->h_p->y;
-	}
-	else
-	{
-		if (v_dist == 0)
-		{
-			g->rcd->tip_p->x = g->rcd->h_p->x;
-			g->rcd->tip_p->y = g->rcd->h_p->y;
-			return ;
-		}
-		g->rcd->tip_p->x = g->rcd->v_p->x;
-		g->rcd->tip_p->y = g->rcd->v_p->y;
-	}
-}
-
-void	render_vision_ray(t_game *g)
-{
-	int		d_x;
-	int		d_y;
-	int		steps;
-	int		i;
-
-	init_raycast_data(g);
-	get_horizontal_intercept(g);
-	get_vertical_intercept(g);
-	if (g->rcd->h_p->x < 0)
-		g->rcd->h_p->x = g->win_w * CUBE_SIZE;
-	if (g->rcd->h_p->y < 0)
-		g->rcd->h_p->y = g->win_h * CUBE_SIZE;
-	if (g->rcd->v_p->x < 0)
-		g->rcd->v_p->x = g->win_w * CUBE_SIZE;
-	if (g->rcd->v_p->y < 0)
-		g->rcd->v_p->y = g->win_h * CUBE_SIZE;
-	choose_ray_tip(g);
-	if (g->rcd->tip_p->y < 0)
-		g->rcd->tip_p->y = 64;
-	else if (g->rcd->tip_p->x < 0)
-		g->rcd->tip_p->x = 64;
-	else if (g->rcd->tip_p->y > g->win_h)
-		g->rcd->tip_p->y = g->win_h - 64;
-	else if (g->rcd->tip_p->x > g->win_w)
-		g->rcd->tip_p->x = g->win_w - 64;
-	printf("chosen tip = [%f, %f]\n", g->rcd->tip_p->x, g->rcd->tip_p->y);
-	printf("angle = [%f]\n", g->rcd->angle);
-	//render_ray_points(g->rcd->h_p->x, g->rcd->h_p->y, g);
-	d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
-	d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
-	if (abs(d_x) > abs(d_y))
-		steps = abs(d_x);
-	else
-		steps = abs(d_y);
-	i = 0;
-	while (i <= steps && steps != 0)
-	{
-		int	tmp_x = g->rcd->p_p->x + (i * d_x) / steps;
-		int	tmp_y = g->rcd->p_p->y + (i * d_y) / steps;
-		render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, g->rcd->p_p->y + (i * d_y) / steps, g);
-		i++;
-	}
-}*/
-
 void	choose_ray_tip(t_game *g)
 {
 	double	h_dist;
@@ -412,7 +337,9 @@ void	init_ray_angles(t_game *g, double *ray_angles)
 	double	start_angle;
 
 	i = 0;
-	start_angle = ((double)FOV / 2) * -1;
+	//start_angle = (((double)FOV / 2) * -1);
+	start_angle = g->player.angle + (((double)FOV / 2) * -1);
+	//printf("start_angle = [%f]\nplayer_angle = [%f]\n", start_angle, g->rcd->angle);
 	while (i < g->win_w)
 	{
 		if (i == 0)
@@ -424,8 +351,80 @@ void	init_ray_angles(t_game *g, double *ray_angles)
 		else if (ray_angles[i] >= 2 * PI)
 			ray_angles[i] = ray_angles[i] - (2 * PI);
 		start_angle += ((double)FOV / (double)g->win_w);
+		//start_angle += FOV / g->win_w;
 		i++;
 	}
+}
+
+void	calc_wall_dist(t_game *g, double ray_angle)
+{
+	double	actual_dist;
+
+	actual_dist = sqrt(((g->rcd->tip_p->x - g->rcd->p_p->x) * (g->rcd->tip_p->x - g->rcd->p_p->x)) + 
+	      			((g->rcd->tip_p->y - g->rcd->p_p->y) * (g->rcd->tip_p->y - g->rcd->p_p->y)));
+	g->rcd->tip_dist = actual_dist * cos(ray_angle - g->rcd->angle);
+}
+
+void	draw_ceiling(t_game *g, int c_x, int cs_y, int ce_y)
+{
+	int	x;
+	int	y;
+
+	x = c_x;
+	y = cs_y;
+	while (y <= ce_y)
+	{
+		x = c_x;
+		while (x < c_x + PX_SIZE)
+		{
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, BLACK);
+			x++;
+		}
+		y++;
+	}
+}
+
+void	draw_ground(t_game *g, int g_x, int gs_y, int ge_y)
+{
+	int	x;
+	int	y;
+
+	x = g_x;
+	y = gs_y;
+	while (y <= ge_y)
+	{
+		x = g_x;
+		while (x < g_x + PX_SIZE)
+		{
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, BLACK);
+			x++;
+		}
+		y++;
+	}
+}
+
+void	draw_stripe(t_game *g, int w_x, int ws_y, int we_y)
+{
+	int	x;
+	int	y;
+
+	x = w_x;
+	y = ws_y;
+	//printf("x = [%d]\n", x);
+	draw_ceiling(g, w_x, 0, ws_y);
+	while (y <= we_y)
+	{
+		x = w_x;
+		//mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
+		while (x < w_x + PX_SIZE)
+		{
+			//printf("drawing at [%d, %d]\n", x, y);
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
+			x++;
+		}
+		y++;
+	}
+	draw_ground(g, w_x, we_y, g->win_h);
 }
 
 void	render_vision_ray(t_game *g)
@@ -436,7 +435,7 @@ void	render_vision_ray(t_game *g)
 	int		i;
 	double	*ray_angles;
 
-	ray_angles = gc_malloc(sizeof(double) * g->win_w);
+	ray_angles = malloc(sizeof(double) * g->win_w);
 	/*int	j = 0;
 	while (j < g->win_w)
 	{
@@ -444,16 +443,26 @@ void	render_vision_ray(t_game *g)
 		j++;
 	}
 	exit(0);*/
+	init_raycast_data(g);
+	init_ray_angles(g, ray_angles);
+	//printf("g player angle = %f\ng rcd angle = %f\n", g->player.angle, g->rcd->angle);
+	//printf("player_dir = [%f]\nmid_ray = [%f]\n", g->rcd->angle, ray_angles[g->win_w / 4]);
 	int	j = 0;
 	while (j < g->win_w)
 	{
-		init_ray_angles(g, ray_angles);
-		init_raycast_data(g);
+		//printf("j = [%d]\n", j);
 		get_horizontal_intercept(g, ray_angles[j]);
 		get_vertical_intercept(g, ray_angles[j]);
 		choose_ray_tip(g);
+		calc_wall_dist(g, ray_angles[j]);
 		
-		d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
+		int	wall_height = (CUBE_SIZE * g->win_h) / g->rcd->tip_dist;
+		int	wall_x = PX_SIZE;
+		int	wall_start_y = (g->win_h / 2) - (wall_height / 2);
+		int	wall_end_y = (g->win_h / 2) + (wall_height / 2);
+		//printf("current ray = [%f]\n", ray_angles[j]);
+		draw_stripe(g, j, wall_start_y, wall_end_y);
+		/*d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
 		d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
 		
 		if (abs(d_x) > abs(d_y))
@@ -467,11 +476,12 @@ void	render_vision_ray(t_game *g)
 			render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, 
 							g->rcd->p_p->y + (i * d_y) / steps, g, PLAYER_COLOR);
 			i++;
-		}
+		}*/
 		//render_point_debug(g, g->rcd->h_p->x, g->rcd->h_p->y, 0x0000FF);
 		//render_point_debug(g, g->rcd->v_p->x, g->rcd->v_p->y, 0x008000);
-		j++;
+		j += wall_x;
 	}
+	free(ray_angles);
 }
 
 void	render_player(t_game *g)
@@ -564,18 +574,18 @@ void	render_map(t_game *g)
 
 int	render(t_game *g)
 {
-	int	i;
+	/*int	i;
 
 	i = 0;
 	while (i <= g->win_h * g->win_w)
 	{
 		g->img.data[i++] = BLACK;
-	}
-	render_map(g);
-	render_player(g);
+	}*/
+	//render_map(g);
+	//render_player(g);
 	render_vision_ray(g);
 	//printf("player = [%f, %f]\n", g->player.pos_x, g->player.pos_y);
-	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
+	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
 }
 
 void	cube_init(t_vars *vars)
@@ -583,8 +593,10 @@ void	cube_init(t_vars *vars)
 	t_game	*g = gc_malloc(sizeof(t_game));
 
 	g->vars = vars;
-	g->win_w = vars->p_data.width * 64;
-	g->win_h = vars->p_data.height * 64;
+	//g->win_w = vars->p_data.width * 64;
+	//g->win_h = vars->p_data.height * 64;
+	g->win_w = 1000;
+	g->win_h = 1000;
 	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
 	g->player.pos_x = (double) g->vars->p_data.p_x;
 	g->player.pos_y = (double) g->vars->p_data.p_y;
