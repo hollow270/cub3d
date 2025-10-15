@@ -26,7 +26,7 @@ int	check_extension(char *file_name);
 #define SKY 0x87CEEB
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
-#define PX_SIZE 5
+#define PX_SIZE 4
 
 int check_new_position(double new_x, double new_y, t_game *g, int dir)
 {
@@ -411,11 +411,11 @@ void	draw_ground(t_game *g, int g_x, int gs_y, int ge_y)
 
 void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
 {
-	int	x;
-	int	y;
-	int	tx_x;
-	int	tx_y;
-	int	progress;
+	int		x;
+	int		y;
+	int		tx_x;
+	int		tx_y;
+	double	progress;
 
 	if (g->rcd->wall_type == HORIZONTAL)
 		tx_x = (int)(g->rcd->tip_p->x) % CUBE_SIZE;
@@ -424,7 +424,8 @@ void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
 	y = ws_y;
 	while (y <= we_y)
 	{
-		progress = (y - ws_y) / g->rcd->wall_height;
+		progress = (double)(y - ws_y) / (double)g->rcd->wall_height;
+		//printf("progress = %f\n", progress);
 		tx_y = (int)(progress * CUBE_SIZE - 1);
 		if (tx_y < 0)
 			tx_y = 0;
