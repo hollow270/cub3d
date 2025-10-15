@@ -17,16 +17,17 @@ int	check_extension(char *file_name);
 #define PI 3.14159
 #define	FOV 60
 #define CUBE_SIZE 64
+#define MINIMAP_SIZE 10
 #define RAY_WIDTH 3
 #define PLAYER_SIZE 10
 #define ROT_SPEED 10
 #define MOVE_SPEED 0.3
 #define WHITE 0xFFFFFF
-#define GROUND 0x87867f
+#define GROUND 0x2b2b2a
 #define SKY 0x87CEEB
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
-#define PX_SIZE 4
+#define PX_SIZE 2
 
 int check_new_position(double new_x, double new_y, t_game *g, int dir)
 {

@@ -1,7 +1,7 @@
-NO assets/north_wall.xpm
-SO assets/east_wall.xpm
-WE assets/south_wall.xpm
-EA assets/west_wall.xpm
+NO assets/n_wall.xpm
+SO assets/s_wall.xpm
+WE assets/w_wall.xpm
+EA assets/e_wall.xpm
 
 F 20,20,20
 C 200,200,200
