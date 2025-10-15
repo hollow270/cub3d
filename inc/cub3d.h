@@ -133,6 +133,8 @@ typedef struct s_game
 	t_img		img;
 	int			win_w;
 	int			win_h;
+	int			minimap_w;
+	int			minimap_h;
 	void		*n_img;
 	void		*e_img;
 	void		*s_img;

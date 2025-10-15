@@ -384,6 +384,11 @@ void	draw_ceiling(t_game *g, int c_x, int cs_y, int ce_y)
 		x = c_x;
 		while (x < c_x + PX_SIZE)
 		{
+			if (y < g->minimap_h && x < g->minimap_w)
+			{
+				x++;
+				continue ;
+			}
 			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, SKY);
 			x++;
 		}
@@ -435,7 +440,14 @@ void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
 		x = w_x;
 		while (x < w_x + PX_SIZE)
 		{
+			if (y < g->minimap_h && x < g->minimap_w)
+			{
+				x++;
+				continue ;
+			}
+			//if (x >= g->minimap_w && y >= g->minimap_h)
 			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, g->chosen_tx[tx_y * CUBE_SIZE + tx_x]);
+			//printf("width = %d\nheight = %d\n", g->minimap_w, g->minimap_h);
 			x++;
 		}
 		y++;
@@ -562,8 +574,8 @@ void	render_player(t_game *g)
 
 	char	**map = g->vars->p_data.matrix;
 
-	start_player_x = g->player.pos_x * CUBE_SIZE;
-	start_player_y = g->player.pos_y * CUBE_SIZE;
+	start_player_x = g->player.pos_x * MINIMAP_SIZE;
+	start_player_y = g->player.pos_y * MINIMAP_SIZE;
 	player_y = 0;
 	while (player_y < PLAYER_SIZE)
 	{
@@ -572,8 +584,9 @@ void	render_player(t_game *g)
 		{
 			pixel_x = start_player_x + player_x - PLAYER_SIZE / 2;
 			pixel_y = start_player_y + player_y - PLAYER_SIZE / 2;
-			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
-			g->img.data[index] = PLAYER_COLOR;
+			mlx_pixel_put(g->vars->mlx, g->vars->win, pixel_x, pixel_y, PLAYER_COLOR);
+			//int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
+			//g->img.data[index] = PLAYER_COLOR;
 			player_x++;
 		}
 		player_y++;
@@ -611,21 +624,22 @@ void	render_map(t_game *g)
 			if (map[map_y][map_x] == '1')
 			{
 				// calculate the position from which we should start drawing the cube
-				start_cube_x = map_x * CUBE_SIZE; 
-				start_cube_y = map_y * CUBE_SIZE;
+				start_cube_x = map_x * MINIMAP_SIZE; 
+				start_cube_y = map_y * MINIMAP_SIZE;
 				// loop through the cube coordinates
 				cube_y = 0;
-				while (cube_y < CUBE_SIZE)
+				while (cube_y < MINIMAP_SIZE)
 				{
 					cube_x = 0;
-					while (cube_x < CUBE_SIZE)
+					while (cube_x < MINIMAP_SIZE)
 					{
 						// calculate the current cube coordinates reached
 						pixel_x = start_cube_x + cube_x;
 						pixel_y = start_cube_y + cube_y;
+						mlx_pixel_put(g->vars->mlx, g->vars->win, pixel_x, pixel_y, WHITE);
 						// convert 2d coordinates to 1d coordinate
-						index = pixel_y * (g->img.line_len / 4) + pixel_x;
-						g->img.data[index] = WHITE;
+						//index = pixel_y * (g->img.line_len / 4) + pixel_x;
+						//g->img.data[index] = WHITE;
 						cube_x++;
 					}
 					cube_y++;
@@ -634,6 +648,32 @@ void	render_map(t_game *g)
 			map_x++;
 		}
 		map_y++;
+	}
+}
+
+int	isnt_wall(int c)
+{
+	return (c == '0' || c == 'N' || c == 'E' || c == 'S' || c == 'W');
+}
+
+void	render_map_background(t_game *g)
+{
+	int		x;
+	int		y;
+	char	**map;
+
+	y = 0;
+	map = g->vars->p_data.matrix;
+	while (y < g->minimap_h)
+	{
+		x = 0;
+		while (x < g->minimap_w)
+		{
+			if (isnt_wall(map[y / MINIMAP_SIZE][x / MINIMAP_SIZE]))
+				mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, GROUND);
+			x++;
+		}
+		y++;
 	}
 }
 
@@ -646,8 +686,9 @@ int	render(t_game *g)
 	{
 		g->img.data[i++] = BLACK;
 	}*/
-	//render_map(g);
-	//render_player(g);
+	render_map_background(g);
+	render_map(g);
+	render_player(g);
 	render_vision_ray(g);
 	//printf("player = [%f, %f]\n", g->player.pos_x, g->player.pos_y);
 	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
@@ -664,6 +705,8 @@ void	cube_init(t_vars *vars)
 	//g->win_h = vars->p_data.height * 64;
 	g->win_w = 1000;
 	g->win_h = 1000;
+	g->minimap_w = g->vars->p_data.width * MINIMAP_SIZE;
+	g->minimap_h = g->vars->p_data.height * MINIMAP_SIZE;
 	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
 	g->player.pos_x = (double) g->vars->p_data.p_x;
 	g->player.pos_y = (double) g->vars->p_data.p_y;
@@ -704,6 +747,7 @@ int	main(int argc, char *argv[])
 
 	while (map[i])
 		printf("[%s]\n", map[i++]);
+	printf("parsed dimensions = [%d, %d]\n", vars.p_data.width, vars.p_data.height);
 	cube_init(&vars);
 	gc_free_all();
 	return (0);
