@@ -19,9 +19,11 @@ int	check_extension(char *file_name);
 #define CUBE_SIZE 64
 #define RAY_WIDTH 3
 #define PLAYER_SIZE 10
-#define ROT_SPEED 3
-#define MOVE_SPEED 0.1
+#define ROT_SPEED 10
+#define MOVE_SPEED 0.3
 #define WHITE 0xFFFFFF
+#define GROUND 0x87867f
+#define SKY 0x87CEEB
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
 #define PX_SIZE 5
@@ -274,23 +276,27 @@ void	choose_ray_tip(t_game *g)
 	{
 		g->rcd->tip_p->x = g->rcd->v_p->x;
 		g->rcd->tip_p->y = g->rcd->v_p->y;
+		g->rcd->wall_type = VERTICAL;
 		return ;
 	}
 	else if (v_dist == 0)
 	{
 		g->rcd->tip_p->x = g->rcd->h_p->x;
 		g->rcd->tip_p->y = g->rcd->h_p->y;
+		g->rcd->wall_type = HORIZONTAL;
 		return ;
 	}
 	else if (h_dist <= v_dist)
 	{
 		g->rcd->tip_p->x = g->rcd->h_p->x;
 		g->rcd->tip_p->y = g->rcd->h_p->y;
+		g->rcd->wall_type = HORIZONTAL;
 	}
 	else
 	{
 		g->rcd->tip_p->x = g->rcd->v_p->x;
 		g->rcd->tip_p->y = g->rcd->v_p->y;
+		g->rcd->wall_type = VERTICAL;
 	}
 }
 
@@ -377,7 +383,7 @@ void	draw_ceiling(t_game *g, int c_x, int cs_y, int ce_y)
 		x = c_x;
 		while (x < c_x + PX_SIZE)
 		{
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, BLACK);
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, SKY);
 			x++;
 		}
 		y++;
@@ -396,7 +402,38 @@ void	draw_ground(t_game *g, int g_x, int gs_y, int ge_y)
 		x = g_x;
 		while (x < g_x + PX_SIZE)
 		{
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, BLACK);
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, GROUND);
+			x++;
+		}
+		y++;
+	}
+}
+
+void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
+{
+	int	x;
+	int	y;
+	int	tx_x;
+	int	tx_y;
+	int	progress;
+
+	if (g->rcd->wall_type == HORIZONTAL)
+		tx_x = (int)(g->rcd->tip_p->x) % CUBE_SIZE;
+	else
+		tx_x = (int)(g->rcd->tip_p->y) % CUBE_SIZE;
+	y = ws_y;
+	while (y <= we_y)
+	{
+		progress = (y - ws_y) / g->rcd->wall_height;
+		tx_y = (int)(progress * CUBE_SIZE - 1);
+		if (tx_y < 0)
+			tx_y = 0;
+		else if (tx_y > 63)
+			tx_y = 63;
+		x = w_x;
+		while (x < w_x + PX_SIZE)
+		{
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, g->n_data[tx_y * CUBE_SIZE + tx_x]);
 			x++;
 		}
 		y++;
@@ -407,23 +444,26 @@ void	draw_stripe(t_game *g, int w_x, int ws_y, int we_y)
 {
 	int	x;
 	int	y;
+	//int	random_color;
 
 	x = w_x;
 	y = ws_y;
 	//printf("x = [%d]\n", x);
 	draw_ceiling(g, w_x, 0, ws_y);
-	while (y <= we_y)
+	draw_wall(g, w_x, ws_y, we_y);
+	/*while (y <= we_y)
 	{
 		x = w_x;
 		//mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
 		while (x < w_x + PX_SIZE)
 		{
 			//printf("drawing at [%d, %d]\n", x, y);
+			//random_color = rand() % 0xFFFFFF;
 			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
 			x++;
 		}
 		y++;
-	}
+	}*/
 	draw_ground(g, w_x, we_y, g->win_h);
 }
 
@@ -460,6 +500,7 @@ void	render_vision_ray(t_game *g)
 		int	wall_x = PX_SIZE;
 		int	wall_start_y = (g->win_h / 2) - (wall_height / 2);
 		int	wall_end_y = (g->win_h / 2) + (wall_height / 2);
+		g->rcd->wall_height = wall_height;
 		//printf("current ray = [%f]\n", ray_angles[j]);
 		draw_stripe(g, j, wall_start_y, wall_end_y);
 		/*d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
@@ -591,6 +632,8 @@ int	render(t_game *g)
 void	cube_init(t_vars *vars)
 {
 	t_game	*g = gc_malloc(sizeof(t_game));
+	int		width = CUBE_SIZE;
+	int		height = CUBE_SIZE;
 
 	g->vars = vars;
 	//g->win_w = vars->p_data.width * 64;
@@ -606,6 +649,14 @@ void	cube_init(t_vars *vars)
 	vars->win = mlx_new_window(vars->mlx, g->win_w, g->win_h, "Dungeon gayme");
 	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);
 	g->img.data = (int *)mlx_get_data_addr(g->img.img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	g->n_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->north_wall, &width, &height);
+	g->e_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->east_wall, &width, &height);
+	g->s_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->south_wall, &width, &height);
+	g->w_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->west_wall, &width, &height);
+	g->n_data = (int *)mlx_get_data_addr(g->n_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	g->e_data = (int *)mlx_get_data_addr(g->e_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	g->s_data = (int *)mlx_get_data_addr(g->s_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	g->w_data = (int *)mlx_get_data_addr(g->w_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	mlx_loop_hook(g->vars->mlx, render, g);
 	mlx_hook(vars->win, 2, 1L<<0, controls, g);
 	mlx_loop(vars->mlx);

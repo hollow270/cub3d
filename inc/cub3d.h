@@ -26,6 +26,12 @@
 # define SO_WALL "./assets/south_wall.xpm"
 # define WE_WALL "./assets/west_wall.xpm"
 
+typedef enum e_wall_type
+{
+	VERTICAL,
+	HORIZONTAL
+}	t_wall_type;
+
 typedef struct s_sprites
 {
 	void	*north_wall;
@@ -82,10 +88,12 @@ typedef struct s_raycast
 {
 	double	angle;
 	//double	**ray_angles;
-	t_pos	*h_p;
-	t_pos	*v_p;
-	t_pos	*p_p;
-	t_pos	*tip_p;
+	t_pos		*h_p;
+	t_pos		*v_p;
+	t_pos		*p_p;
+	t_pos		*tip_p;
+	t_wall_type	wall_type;
+	int			wall_height;
 	double	tip_dist;
 }			t_raycast;
 
@@ -125,6 +133,15 @@ typedef struct s_game
 	t_img		img;
 	int			win_w;
 	int			win_h;
+	void		*n_img;
+	void		*e_img;
+	void		*s_img;
+	void		*w_img;
+	int			*n_data;
+	int			*e_data;
+	int			*s_data;
+	int			*w_data;
+	double		*ray_angles;
 }	t_game;
 
 /*		TESTING			
