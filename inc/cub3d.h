@@ -141,6 +141,7 @@ typedef struct s_game
 	int			*e_data;
 	int			*s_data;
 	int			*w_data;
+	int			*chosen_tx;
 	double		*ray_angles;
 }	t_game;
 

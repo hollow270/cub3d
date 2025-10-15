@@ -434,7 +434,7 @@ void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
 		x = w_x;
 		while (x < w_x + PX_SIZE)
 		{
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, g->n_data[tx_y * CUBE_SIZE + tx_x]);
+			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, g->chosen_tx[tx_y * CUBE_SIZE + tx_x]);
 			x++;
 		}
 		y++;
@@ -468,6 +468,27 @@ void	draw_stripe(t_game *g, int w_x, int ws_y, int we_y)
 	draw_ground(g, w_x, we_y, g->win_h);
 }
 
+void	choose_texture(t_game *g, double ray_angle)
+{
+	double	degree_angle;
+
+	degree_angle = ray_angle * 180 / PI;
+	if (g->rcd->wall_type == HORIZONTAL)
+	{
+		if (degree_angle >= 0 && degree_angle <= 180)
+			g->chosen_tx = g->n_data;
+		else if (degree_angle > 180 && degree_angle <= 360)
+			g->chosen_tx = g->s_data;
+	}
+	else if (g->rcd->wall_type == VERTICAL)
+	{
+		if (cos(ray_angle) > 0)
+			g->chosen_tx = g->w_data;
+		else if (cos(ray_angle) < 0)
+			g->chosen_tx = g->e_data;
+	}
+}
+
 void	render_vision_ray(t_game *g)
 {
 	int		d_x;
@@ -495,6 +516,7 @@ void	render_vision_ray(t_game *g)
 		get_horizontal_intercept(g, ray_angles[j]);
 		get_vertical_intercept(g, ray_angles[j]);
 		choose_ray_tip(g);
+		choose_texture(g, ray_angles[j]);
 		calc_wall_dist(g, ray_angles[j]);
 		
 		int	wall_height = (CUBE_SIZE * g->win_h) / g->rcd->tip_dist;

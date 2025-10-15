@@ -1,80 +1,20 @@
-texture_x = (int)(tip_p->x) % 64
-```
+2. Determine Wall Direction in render_vision_ray
+After calling choose_ray_tip(), you need to figure out which wall face was hit. Add logic like:
+Check if horizontal or vertical wall hit:
 
-For **vertical walls**:
-```
-texture_x = (int)(tip_p->y) % 64
-```
+Compare h_dist vs v_dist (you already do this in choose_ray_tip)
+Store which type was chosen (horizontal or vertical)
 
-The modulo gives you 0-63, which maps to the texture column.
+Determine compass direction:
+For horizontal walls:
 
-### 4. Modify `draw_stripe` to Sample Textures
+If ray angle is 0° to 180° (pointing down): You hit a NORTH face
+If ray angle is 180° to 360° (pointing up): You hit a SOUTH face
 
-Currently your `draw_stripe` draws solid white. You need to change it to:
+For vertical walls:
 
-For each Y pixel in the wall stripe:
-- Calculate how far down the wall you are (0.0 at top to 1.0 at bottom)
-- Convert this to texture Y coordinate (0 to 63)
-- Get the color from `texture_data[texture_y * 64 + texture_x]`
-- Draw that color instead of white
+If cos(ray_angle) > 0 (pointing right): You hit a WEST face
+If cos(ray_angle) < 0 (pointing left): You hit an EAST face
 
-**The calculation:**
-```
-For Y from wall_start_y to wall_end_y:
-    progress = (Y - wall_start_y) / wall_height
-    texture_y = (int)(progress * 63)
-    
-    // Clamp texture_y
-    if texture_y < 0: texture_y = 0
-    if texture_y > 63: texture_y = 63
-    
-    // Get color from appropriate texture
-    color = texture_data[texture_y * 64 + texture_x]
-    
-    // Draw PX_SIZE wide stripe with this color
-    mlx_pixel_put(..., color)
-```
 
-## Data Structure Additions Needed
-
-You'll need to add to your structs:
-
-**In game struct:**
-- 4 texture image pointers (void*)
-- 4 texture data arrays (int*)
-- Texture width/height (probably both 64)
-
-**In raycast struct (or pass as parameters):**
-- Which wall direction was hit
-- The texture X coordinate
-
-## High-Level Flow
-```
-1. At init:
-   - Load north_texture.xpm → get north_data array
-   - Load south_texture.xpm → get south_data array
-   - Load east_texture.xpm → get east_data array
-   - Load west_texture.xpm → get west_data array
-
-2. For each ray in render_vision_ray:
-   - Cast ray (you already do this)
-   - Determine wall direction (add this)
-   - Calculate texture_x (add this)
-   - Pass wall_direction and texture_x to draw_stripe
-   
-3. In draw_stripe:
-   - Select appropriate texture based on wall_direction
-   - For each Y pixel:
-     * Calculate texture_y
-     * Get color from texture[texture_y * 64 + texture_x]
-     * Draw that color
-```
-
-## Important Notes
-
-**Performance Warning:** Using `mlx_pixel_put` for every pixel will be VERY slow. For textures, you're drawing thousands of pixels per frame. Consider switching back to the image buffer method for better performance.
-
-**Texture Access:** The texture data array works exactly like your screen buffer:
-```
-color = texture_data[y * width + x]
-
+formula: radian * 180 / PI
