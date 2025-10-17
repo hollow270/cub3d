@@ -13,6 +13,7 @@
 #include "../inc/cub3d.h"
 
 int	check_extension(char *file_name);
+int	close_game(t_game *g);
 
 #define PI 3.14159
 #define	FOV 60
@@ -21,13 +22,13 @@ int	check_extension(char *file_name);
 #define RAY_WIDTH 3
 #define PLAYER_SIZE 10
 #define ROT_SPEED 10
-#define MOVE_SPEED 0.3
+#define MOVE_SPEED 0.1
 #define WHITE 0xFFFFFF
 #define GROUND 0x2b2b2a
 #define SKY 0x87CEEB
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
-#define PX_SIZE 2
+#define PX_SIZE 3
 
 int check_new_position(double new_x, double new_y, t_game *g, int dir)
 {
@@ -53,6 +54,20 @@ int check_new_position(double new_x, double new_y, t_game *g, int dir)
 
 int	controls(int keycode, t_game *g)
 {
+	if (keycode == 65307)
+		return (close_game(g));
+	if (keycode == 109 && g->mouse_control == false)
+	{
+		mlx_mouse_hide(g->vars->mlx, g->vars->win);  // Hide cursor
+		g->mouse_control = true;
+		return (0);
+	}
+	else if (keycode == 109 && g->mouse_control == true)
+	{
+		mlx_mouse_show(g->vars->mlx, g->vars->win);
+		g->mouse_control = false;
+		return (0);
+	}
 	double	angle = g->player.angle * PI / 180;
 	if (keycode == 'w')
 	{
@@ -84,7 +99,7 @@ int	controls(int keycode, t_game *g)
 		g->player.angle -= ROT_SPEED;
 	else if (keycode == 65363 || keycode == 124) // right arrow
 		g->player.angle += ROT_SPEED;*/
-	if (keycode == 65361 || keycode == 123)
+	else if (keycode == 65361 || keycode == 123)
 	{
 		g->player.angle -= ROT_SPEED;
 		if (g->player.angle < 0)
@@ -96,6 +111,7 @@ int	controls(int keycode, t_game *g)
 		if (g->player.angle >= 360)
 			g->player.angle -= 360;
 	}
+	return (0);
 }
 
 void	render_ray_points(int x, int y, t_game *g, int color)
@@ -529,6 +545,7 @@ void	render_vision_ray(t_game *g)
 		get_horizontal_intercept(g, ray_angles[j]);
 		get_vertical_intercept(g, ray_angles[j]);
 		choose_ray_tip(g);
+		
 		choose_texture(g, ray_angles[j]);
 		calc_wall_dist(g, ray_angles[j]);
 		
@@ -694,6 +711,78 @@ int	render(t_game *g)
 	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
 }
 
+/*int	pointer_motion(int x, int y, t_game *g)
+{
+	static int	prv_x;
+	int			diff;
+	int			rot_angle;
+
+	printf("motion = [%d]\n", x - g->win_w / 2);
+	diff = prv_x - x;
+	rot_angle = diff * 0.3;
+	g->player.angle -= rot_angle;
+	prv_x = x;
+}*/
+
+/*int pointer_motion(int x, int y, t_game *g)
+{
+    static int prv_x = -1;
+    int diff;
+    
+    if (prv_x == -1) // First frame
+        prv_x = x;
+    
+    diff = prv_x - x;
+    g->player.angle -= diff * 0.3;
+    
+    // Normalize angle
+    if (g->player.angle < 0)
+        g->player.angle += 360;
+    else if (g->player.angle >= 360)
+        g->player.angle -= 360;
+    
+    prv_x = x;
+    return (0);
+}*/
+
+int pointer_motion(int x, int y, t_game *g)
+{
+    static int first_motion = 1;
+    int center_x = g->win_w / 2;
+    int center_y = g->win_h / 2;
+    int diff;
+
+	if (g->mouse_control == 0)
+		return (0);
+    if (first_motion)
+    {
+        first_motion = 0;
+        mlx_mouse_move(g->vars->mlx, g->vars->win, center_x, center_y);
+        return (0);
+    }
+    diff = x - center_x;
+    g->player.angle += diff * 0.05;
+    if (g->player.angle < 0)
+        g->player.angle += 360;
+    else if (g->player.angle >= 360)
+        g->player.angle -= 360;
+    mlx_mouse_move(g->vars->mlx, g->vars->win, center_x, center_y);
+    return (0);
+}
+
+int	close_game(t_game *g)
+{
+	mlx_destroy_image(g->vars->mlx, g->e_img);
+	mlx_destroy_image(g->vars->mlx, g->n_img);
+	mlx_destroy_image(g->vars->mlx, g->w_img);
+	mlx_destroy_image(g->vars->mlx, g->s_img);
+	mlx_destroy_image(g->vars->mlx, g->img.img);
+	mlx_destroy_window(g->vars->mlx, g->vars->win);
+	mlx_destroy_display(g->vars->mlx);
+	gc_free_all();
+	return(exit(0), 0);
+}
+
 void	cube_init(t_vars *vars)
 {
 	t_game	*g = gc_malloc(sizeof(t_game));
@@ -703,8 +792,8 @@ void	cube_init(t_vars *vars)
 	g->vars = vars;
 	//g->win_w = vars->p_data.width * 64;
 	//g->win_h = vars->p_data.height * 64;
-	g->win_w = 1000;
-	g->win_h = 1000;
+	g->win_w = 600;
+	g->win_h = 600;
 	g->minimap_w = g->vars->p_data.width * MINIMAP_SIZE;
 	g->minimap_h = g->vars->p_data.height * MINIMAP_SIZE;
 	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
@@ -724,8 +813,13 @@ void	cube_init(t_vars *vars)
 	g->e_data = (int *)mlx_get_data_addr(g->e_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->s_data = (int *)mlx_get_data_addr(g->s_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->w_data = (int *)mlx_get_data_addr(g->w_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	g->mouse_control = false;
 	mlx_loop_hook(g->vars->mlx, render, g);
 	mlx_hook(vars->win, 2, 1L<<0, controls, g);
+	mlx_hook(vars->win, DestroyNotify, 0, close_game, g);
+	mlx_hook(vars->win, MotionNotify, PointerMotionMask, pointer_motion, g);
+	//mlx_mouse_hide(vars->mlx, vars->win);  // Hide cursor
+    mlx_mouse_move(vars->mlx, vars->win, g->win_w / 2, g->win_h / 2); // Center it
 	mlx_loop(vars->mlx);
 	render(g);
 }

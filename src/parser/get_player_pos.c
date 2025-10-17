@@ -78,7 +78,7 @@ int	is_valid_char(int c)
 {
 	return (c == '1' || c == '0' || c == 'N'
 			|| c == 'E' || c == 'S' || c == 'W'
-			|| c == ' ');
+			|| c == ' ' || c == 'D');
 }
 
 int	is_player(int c)

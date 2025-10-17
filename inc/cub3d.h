@@ -18,6 +18,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <X11/X.h>
+# include <stdbool.h>
 # include "get_next_line.h"
 # include "../src/.mlx/mlx.h"
 
@@ -29,7 +31,8 @@
 typedef enum e_wall_type
 {
 	VERTICAL,
-	HORIZONTAL
+	HORIZONTAL,
+	DOOR
 }	t_wall_type;
 
 typedef struct s_sprites
@@ -145,6 +148,7 @@ typedef struct s_game
 	int			*w_data;
 	int			*chosen_tx;
 	double		*ray_angles;
+	bool		mouse_control;
 }	t_game;
 
 /*		TESTING			

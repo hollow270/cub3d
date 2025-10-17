@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "/home/yhajbi/Desktop/42_cursus/cub3d/cub3d",
       "args": [
-        "maps/square.cub"
+        "maps/map.cub"
       ],
       "stopAtEntry": false,
       "cwd": "/home/yhajbi/Desktop/42_cursus/cub3d",

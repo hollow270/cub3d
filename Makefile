@@ -1,4 +1,4 @@
-CC = gcc -g #-Wall -Wextra -Werror
+CC = gcc -g #-fsanitize=address#-Wall -Wextra -Werror
 MLXFALGS = -lXext -lX11 -lm
 
 ARC = src/.mlx/libmlx_Linux.a

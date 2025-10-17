@@ -26,7 +26,7 @@ char	**extract_map(t_parse_data *p_data)
 		node = node->next;
 	node = node->next;
 	height = calculate_height(node);
-	ret = gc_malloc(sizeof(char *) * height + 1);
+	ret = gc_malloc(sizeof(char *) * (height + 1));
 	i = 0;
 	while (node && ft_strcmp(node->line, "MAP_END") != 0)
 	{

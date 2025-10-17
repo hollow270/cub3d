@@ -21,8 +21,8 @@ int	test_assets(t_parse_data *p_data)
 {
 	if (check_xpm_extension(p_data) == 0)
 		return (printf("Error\nInvalid texture extension\n"), 0);
-	if (check_color_values(p_data->assets->c_rgb) == 0 || check_color_values(p_data->assets->f_rgb) == 0)
-		return (printf("Error\nInvalid color config\n"), 0);
+	/*if (check_color_values(p_data->assets->c_rgb) == 0 || check_color_values(p_data->assets->f_rgb) == 0)
+		return (printf("Error\nInvalid color config\n"), 0);*/
 	if (open_texture_files(p_data) == 0)
 		return (printf("Error\nCan't open texture files\n"), 0);
 	return (1);
@@ -63,7 +63,7 @@ int	check_color_values(int rgb[3])
 	int	i;
 
 	i = 0;
-	while (rgb[i])
+	while (rgb[i] && i < 3)
 	{
 		if (rgb[i] < 0)
 			return (0);
