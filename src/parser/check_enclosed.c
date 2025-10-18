@@ -77,7 +77,7 @@ int	count_height(char **map)
 int	is_inner_char(int c)
 {
 	return (c == '0' || c == 'N' || c == 'E' || c == 'S'
-			|| c == 'W');
+			|| c == 'W' || c == 'D');
 }
 
 int	count_width(char **map, int y)

@@ -23,6 +23,7 @@ int	parse_map_file(char *file_name, t_parse_data *p_data)
 	int	fd;
 
 	p_data->is_valid = 1;
+	p_data->has_door = 0;
 	fd = open(file_name, O_RDONLY);
 	if (fd < 0)
 		return (printf("Error\nCan't open/inexistent map file\n"), p_data->is_valid = 0, 0);
@@ -35,6 +36,11 @@ int	parse_map_file(char *file_name, t_parse_data *p_data)
 	if (test_assets(p_data) == 0)
 		return (close(fd), 0);
 	p_data->matrix = extract_map(p_data);
+	char	**map = p_data->matrix;
+	int		i = 0;
+
+	while (map[i])
+		printf("[%s]\n", map[i++]);
 	if (!p_data->matrix)
 		return (close(fd), printf("Error\nCan't extract map, probable malloc failure\n"), 0);
 	if (check_enclosed(p_data) == 0)

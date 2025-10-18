@@ -31,8 +31,7 @@
 typedef enum e_wall_type
 {
 	VERTICAL,
-	HORIZONTAL,
-	DOOR
+	HORIZONTAL
 }	t_wall_type;
 
 typedef struct s_sprites
@@ -49,6 +48,7 @@ typedef struct s_assets
 	char	*east_wall;
 	char	*south_wall;
 	char	*west_wall;
+	char	*door;
 	int		f_rgb[3];
 	int		c_rgb[3];
 }			t_assets;
@@ -71,6 +71,7 @@ typedef struct s_parse_data
 	double		angle;
 	int			height;
 	int			width;
+	int			has_door;
 }				t_parse_data;
 
 typedef struct s_vars
@@ -96,8 +97,9 @@ typedef struct s_raycast
 	t_pos		*p_p;
 	t_pos		*tip_p;
 	t_wall_type	wall_type;
+	int			is_door;
 	int			wall_height;
-	double	tip_dist;
+	double		tip_dist;
 }			t_raycast;
 
 typedef struct s_garbage
@@ -142,10 +144,12 @@ typedef struct s_game
 	void		*e_img;
 	void		*s_img;
 	void		*w_img;
+	void		*d_img;
 	int			*n_data;
 	int			*e_data;
 	int			*s_data;
 	int			*w_data;
+	int			*d_data;
 	int			*chosen_tx;
 	double		*ray_angles;
 	bool		mouse_control;
@@ -202,7 +206,8 @@ size_t		ft_strlcpy(char *dest, const char *src, size_t n);
 char		*ft_strdup(const char *s);
 int			ft_strncmp(const char *s1, const char *s2, size_t n);
 int			ft_atoi(const char *nptr);
-int		ft_splitlen(char **split);
+int			ft_splitlen(char **split);
+char		*ft_strstr(char *s1, char *s2);
 void		free_map_lines(t_map_line *head);
 void		*gc_malloc(size_t size);
 void		gc_free_all(void);

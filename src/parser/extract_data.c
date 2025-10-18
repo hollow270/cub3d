@@ -47,6 +47,8 @@ t_map_line	*extract_assets(t_parse_data *p_data)
 			p_data->assets->south_wall = ft_split(node->line, ' ')[1];
 		else if (ft_strncmp("WE ", node->line, 3) == 0)
 			p_data->assets->west_wall = ft_split(node->line, ' ')[1];
+		else if (ft_strncmp("DO ", node->line, 3) == 0)
+			p_data->assets->door = ft_split(node->line, ' ')[1];
 		else if (ft_strncmp("C ", node->line, 2) == 0)
 			extract_color(p_data, node, 1);
 		else if (ft_strncmp("F ", node->line, 2) == 0)

@@ -20,14 +20,24 @@ t_map_line	*interpret_file_content(t_parse_data *p_data)
 	int			txtr_found;
 	t_map_line	*map_lines;
 	int			i;
+	int			limit;
 
 	txtr_found = 0;
 	map_lines = NULL;
 	i = 0;
 	add_line_node(&map_lines, create_line_node(ft_strdup("ASSETS")));
+	limit = 6;
 	while (p_data->file_content[i])
 	{
-		if (i == 6 && !txtr_found)
+		if (ft_strstr(p_data->file_content[i], "DO "))
+		{
+			add_line_node(&map_lines, create_line_node(ft_strdup(p_data->file_content[i])));
+			p_data->has_door = 1;
+			i++;
+			limit = 7;
+			continue ;
+		}
+		if (i == limit && !txtr_found)
 		{
 			add_line_node(&map_lines, create_line_node(ft_strdup("MAP_START")));
 			add_line_node(&map_lines, create_line_node(ft_strdup(p_data->file_content[i])));

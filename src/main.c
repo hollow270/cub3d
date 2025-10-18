@@ -160,7 +160,7 @@ int	is_wall(t_game *g, double x, double y)
 		return (1);
 	map = g->vars->p_data.matrix;
 	//if (map[(int)(y / 64)][(int)(x / 64)] == '1')
-	if (map[map_y][map_x] == '1')
+	if (map[map_y][map_x] == '1' || map[map_y][map_x] == 'D')
 		return (1);
 	return (0);
 }
@@ -178,6 +178,7 @@ void	init_raycast_data(t_game *g)
 	g->rcd->tip_p = gc_malloc(sizeof(t_pos));
 	g->rcd->tip_p->x = 0;
 	g->rcd->tip_p->y = 0;
+	g->rcd->is_door = 0;
 }
 
 void	get_horizontal_intercept(t_game *g, double angle)
@@ -502,7 +503,9 @@ void	choose_texture(t_game *g, double ray_angle)
 	double	degree_angle;
 
 	degree_angle = ray_angle * 180 / PI;
-	if (g->rcd->wall_type == HORIZONTAL)
+	if (g->rcd->is_door == 1)
+		g->chosen_tx = g->d_data;
+	else if (g->rcd->wall_type == HORIZONTAL)
 	{
 		if (degree_angle >= 0 && degree_angle <= 180)
 			g->chosen_tx = g->n_data;
@@ -517,6 +520,61 @@ void	choose_texture(t_game *g, double ray_angle)
 			g->chosen_tx = g->e_data;
 	}
 }
+
+void	check_door_intercept(t_game *g)
+{
+	char	**map;
+	int		x;
+	int		y;
+	int		check_x;
+	int		check_y;
+
+	map = g->vars->p_data.matrix;
+	check_x = g->rcd->tip_p->x;
+	check_y = g->rcd->tip_p->y;
+	if (g->rcd->wall_type == HORIZONTAL
+		&& g->rcd->p_p->y > g->rcd->tip_p->y)
+	{
+		check_y -= 1;
+	}
+	else if (g->rcd->wall_type == VERTICAL
+		&& g->rcd->p_p->x > g->rcd->tip_p->x)
+	{
+		check_x -= 1;
+	}
+	x = check_x / CUBE_SIZE;
+	y = check_y / CUBE_SIZE;
+	if (x < 0 || x > g->vars->p_data.width)
+		return ;
+	else if (y < 0 || y > g->vars->p_data.height)
+		return ;
+	if (map[y][x] == 'D')
+		g->rcd->is_door = 1;
+	else
+		g->rcd->is_door = 0;
+}
+
+/*void	check_door_intercept(t_game *g)
+{
+	char	**map;
+	int		x;
+	int		y;
+
+	map = g->vars->p_data.matrix;
+	x = g->rcd->tip_p->x / CUBE_SIZE;
+	y = g->rcd->tip_p->y / CUBE_SIZE;
+	if (x > g->vars->p_data.width || x < 0)
+		return ;
+	else if (y > g->vars->p_data.height || y < 0)
+		return ;
+	if (map[y][x] == 'D')
+	{
+		g->rcd->is_door = 1;
+		//printf("[%d, %d]\n", x, y);
+	}
+	else
+		g->rcd->is_door = 0;
+}*/
 
 void	render_vision_ray(t_game *g)
 {
@@ -545,7 +603,7 @@ void	render_vision_ray(t_game *g)
 		get_horizontal_intercept(g, ray_angles[j]);
 		get_vertical_intercept(g, ray_angles[j]);
 		choose_ray_tip(g);
-		
+		check_door_intercept(g);
 		choose_texture(g, ray_angles[j]);
 		calc_wall_dist(g, ray_angles[j]);
 		
@@ -809,10 +867,14 @@ void	cube_init(t_vars *vars)
 	g->e_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->east_wall, &width, &height);
 	g->s_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->south_wall, &width, &height);
 	g->w_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->west_wall, &width, &height);
+	if (g->vars->p_data.has_door)
+		g->d_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->door, &width, &height);
 	g->n_data = (int *)mlx_get_data_addr(g->n_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->e_data = (int *)mlx_get_data_addr(g->e_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->s_data = (int *)mlx_get_data_addr(g->s_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->w_data = (int *)mlx_get_data_addr(g->w_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	if (g->vars->p_data.has_door)
+		g->d_data = (int *)mlx_get_data_addr(g->d_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->mouse_control = false;
 	mlx_loop_hook(g->vars->mlx, render, g);
 	mlx_hook(vars->win, 2, 1L<<0, controls, g);
