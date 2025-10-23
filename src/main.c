@@ -30,6 +30,7 @@ void	use_door(t_game *g);
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
 #define PX_SIZE 3
+#define DOOR_OPEN_DIST 140
 
 int	is_not_passable(int c)
 {
@@ -579,6 +580,15 @@ void	calc_wall_dist(t_game *g, double ray_angle)
 	g->rcd->tip_dist = actual_dist * cos(ray_angle - g->rcd->angle);
 }
 
+void	calc_wall_dist2(t_game *g, double ray_angle)
+{
+	double	actual_dist;
+
+	actual_dist = sqrt(((g->mrcd->tip_p->x - g->mrcd->p_p->x) * (g->mrcd->tip_p->x - g->mrcd->p_p->x)) + 
+	      			((g->mrcd->tip_p->y - g->mrcd->p_p->y) * (g->mrcd->tip_p->y - g->mrcd->p_p->y)));
+	g->mrcd->tip_dist = actual_dist * cos(ray_angle - g->mrcd->angle);
+}
+
 void	draw_ceiling(t_game *g, int c_x, int cs_y, int ce_y)
 {
 	int	x;
@@ -785,6 +795,7 @@ void	render_vision_ray(t_game *g)
 	get_horizontal_intercept2(g, ray_angles[g->win_w / 2]);
 	get_vertical_intercept2(g, ray_angles[g->win_w / 2]);
 	choose_ray_tip2(g);
+	calc_wall_dist2(g, ray_angles[g->win_w / 2]);
 	//printf("mid ray = %f %f\n", g->mrcd->tip_p->x, g->mrcd->tip_p->y);
 	//printf("g player angle = %f\ng rcd angle = %f\n", g->player.angle, g->rcd->angle);
 	//printf("player_dir = [%f]\nmid_ray = [%f]\n", g->rcd->angle, ray_angles[g->win_w / 4]);
@@ -853,16 +864,16 @@ void	use_door(t_game *g)
 	else if (map_y > g->vars->p_data.height)
 		map_y = g->vars->p_data.height;
 	map = g->vars->p_data.matrix;
-	if (map[map_y][map_x] == 'D')
+	if (map[map_y][map_x] == 'D' && g->mrcd->tip_dist < DOOR_OPEN_DIST)
 		map[map_y][map_x] = 'O';
-	else if (map[map_y][map_x] == 'O')
+	else if (map[map_y][map_x] == 'O' && g->mrcd->tip_dist < DOOR_OPEN_DIST)
 		map[map_y][map_x] = 'D';
 	int	i = 0;
 
 	while (map[i])
 		printf("%s\n", map[i++]);
 	//printf("%f\n", door.rcd->angle);
-	printf("%d, %d = %c\n", map_x, map_y, map[map_y][map_x]);
+	printf("%d, %d = %c\ndistance = %f\n", map_x, map_y, map[map_y][map_x], g->mrcd->tip_dist);
 }
 
 void	render_player(t_game *g)
