@@ -134,6 +134,7 @@ typedef struct s_game
 {
 	t_vars		*vars;
 	t_raycast	*rcd;
+	t_raycast	*mrcd;
 	t_player	player;
 	t_img		img;
 	int			win_w;

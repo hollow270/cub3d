@@ -14,6 +14,7 @@
 
 int	check_extension(char *file_name);
 int	close_game(t_game *g);
+void	use_door(t_game *g);
 
 #define PI 3.14159
 #define	FOV 60
@@ -30,23 +31,33 @@ int	close_game(t_game *g);
 #define PLAYER_COLOR 0xFF0000
 #define PX_SIZE 3
 
+int	is_not_passable(int c)
+{
+	if (c == '1' || c == 'D')
+		return (1);
+	return (0);
+}
+
 int check_new_position(double new_x, double new_y, t_game *g, int dir)
 {
     double player_size_in_map = (double)PLAYER_SIZE / CUBE_SIZE;
     
     if (dir == 'a' || dir == 'w')
     {
-        if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)] == '1')
+        //if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)] == '1')
+		if (is_not_passable(g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)]))
             return (0);
     }
     else if (dir == 'd')
     {
-        if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x + player_size_in_map)] == '1')
+        //if (g->vars->p_data.matrix[(int)(new_y)][(int)(new_x + player_size_in_map)] == '1')
+		if (is_not_passable(g->vars->p_data.matrix[(int)(new_y)][(int)(new_x + player_size_in_map)]))
             return (0);
     }
     else if (dir == 's')
     {
-        if (g->vars->p_data.matrix[(int)(new_y + player_size_in_map)][(int)(new_x)] == '1')
+        //if (g->vars->p_data.matrix[(int)(new_y + player_size_in_map)][(int)(new_x)] == '1')
+		if (is_not_passable(g->vars->p_data.matrix[(int)(new_y + player_size_in_map)][(int)(new_x)]))
             return (0);
     }
     return (1);
@@ -54,6 +65,8 @@ int check_new_position(double new_x, double new_y, t_game *g, int dir)
 
 int	controls(int keycode, t_game *g)
 {
+	if (keycode == 101)
+		use_door(g);
 	if (keycode == 65307)
 		return (close_game(g));
 	if (keycode == 109 && g->mouse_control == false)
@@ -161,6 +174,29 @@ int	is_wall(t_game *g, double x, double y)
 	map = g->vars->p_data.matrix;
 	//if (map[(int)(y / 64)][(int)(x / 64)] == '1')
 	if (map[map_y][map_x] == '1' || map[map_y][map_x] == 'D')
+		//|| map[map_y][map_x] == 'O')
+		return (1);
+	return (0);
+}
+
+int	is_wall2(t_game *g, double x, double y)
+{
+	char	**map;
+	int		map_x;
+	int		map_y;
+	int		width;
+	int		height;
+
+	map_x = (int)x / 64;
+	map_y = (int)y / 64;
+	width = g->vars->p_data.width;
+	height = g->vars->p_data.height;
+	if (map_x < 0 || map_x >= width || map_y < 0 || map_y >= height)
+		return (1);
+	map = g->vars->p_data.matrix;
+	//if (map[(int)(y / 64)][(int)(x / 64)] == '1')
+	if (map[map_y][map_x] == '1' || map[map_y][map_x] == 'D'
+		|| map[map_y][map_x] == 'O')
 		return (1);
 	return (0);
 }
@@ -179,6 +215,22 @@ void	init_raycast_data(t_game *g)
 	g->rcd->tip_p->x = 0;
 	g->rcd->tip_p->y = 0;
 	g->rcd->is_door = 0;
+}
+
+void	init_raycast_data2(t_game *g)
+{
+	g->mrcd = gc_malloc(sizeof(t_raycast));
+	g->mrcd->p_p = gc_malloc(sizeof(t_pos));
+	g->mrcd->p_p->x = g->player.pos_x * 64;
+	g->mrcd->p_p->y = g->player.pos_y * 64;
+	g->mrcd->angle = g->player.angle * PI / 180;
+	//g->mrcd->ray_angles = gc_malloc(sizeof(double) * g->win_w);
+	g->mrcd->h_p = gc_malloc(sizeof(t_pos));
+	g->mrcd->v_p = gc_malloc(sizeof(t_pos));
+	g->mrcd->tip_p = gc_malloc(sizeof(t_pos));
+	g->mrcd->tip_p->x = 0;
+	g->mrcd->tip_p->y = 0;
+	g->mrcd->is_door = 0;
 }
 
 void	get_horizontal_intercept(t_game *g, double angle)
@@ -227,6 +279,56 @@ void	get_horizontal_intercept(t_game *g, double angle)
 		
 		g->rcd->h_p->x += x_step;
 		g->rcd->h_p->y += y_step;
+		max_i--;
+	}
+}
+
+void	get_horizontal_intercept2(t_game *g, double angle)
+{
+	double	x_step;
+	double	y_step;
+	int		max_i;
+
+	if (fabs(sin(angle)) < 0.0001)
+	{
+		g->mrcd->h_p->x = g->mrcd->p_p->x;
+		g->mrcd->h_p->y = g->mrcd->p_p->y;
+		return;
+	}
+
+	// Ray pointing up (270° direction, angle > 180 in screen coords)
+	if (angle > PI)
+	{
+		g->mrcd->h_p->y = floor(g->mrcd->p_p->y / 64) * 64;
+		// If exactly on grid line, move one step back
+		if (g->mrcd->h_p->y == g->mrcd->p_p->y)
+			g->mrcd->h_p->y -= 64;
+		y_step = -64;
+	}
+	else  // Ray pointing down (90° direction)
+	{
+		g->mrcd->h_p->y = ceil(g->mrcd->p_p->y / 64) * 64;
+		// If exactly on grid line, move one step forward
+		if (g->mrcd->h_p->y == g->mrcd->p_p->y)
+			g->mrcd->h_p->y += 64;
+		y_step = 64;
+	}
+	
+	g->mrcd->h_p->x = g->mrcd->p_p->x + ((g->mrcd->h_p->y - g->mrcd->p_p->y) / tan(angle));
+	x_step = y_step / tan(angle);
+	
+	max_i = 100;
+	while (max_i != 0)
+	{
+		double check_y = g->mrcd->h_p->y;
+		if (y_step < 0)
+			check_y -= 1;
+		
+		if (is_wall2(g, g->mrcd->h_p->x, check_y))
+			break;
+		
+		g->mrcd->h_p->x += x_step;
+		g->mrcd->h_p->y += y_step;
 		max_i--;
 	}
 }
@@ -281,6 +383,56 @@ void	get_vertical_intercept(t_game *g, double angle)
 	}
 }
 
+void	get_vertical_intercept2(t_game *g, double angle)
+{
+	double	x_step;
+	double	y_step;
+	int		max_i;
+
+	if (fabs(cos(angle)) < 0.0001)
+	{
+		g->mrcd->v_p->x = g->mrcd->p_p->x;
+		g->mrcd->v_p->y = g->mrcd->p_p->y;
+		return;
+	}
+
+	// Ray pointing right (0° direction)
+	if (cos(angle) > 0)
+	{
+		g->mrcd->v_p->x = ceil(g->mrcd->p_p->x / 64) * 64;
+		// If exactly on grid line, move one step forward
+		if (g->mrcd->v_p->x == g->mrcd->p_p->x)
+			g->mrcd->v_p->x += 64;
+		x_step = 64;
+	}
+	else  // Ray pointing left (180° direction)
+	{
+		g->mrcd->v_p->x = floor(g->mrcd->p_p->x / 64) * 64;
+		// If exactly on grid line, move one step back
+		if (g->mrcd->v_p->x == g->mrcd->p_p->x)
+			g->mrcd->v_p->x -= 64;
+		x_step = -64;
+	}
+	
+	g->mrcd->v_p->y = g->mrcd->p_p->y + ((g->mrcd->v_p->x - g->mrcd->p_p->x) * tan(angle));
+	y_step = x_step * tan(angle);
+	
+	max_i = 100;
+	while (max_i != 0)
+	{
+		double check_x = g->mrcd->v_p->x;
+		if (x_step < 0)
+			check_x -= 1;
+		
+		if (is_wall2(g, check_x, g->mrcd->v_p->y))
+			break;
+		
+		g->mrcd->v_p->x += x_step;
+		g->mrcd->v_p->y += y_step;
+		max_i--;
+	}
+}
+
 void	choose_ray_tip(t_game *g)
 {
 	double	h_dist;
@@ -315,6 +467,43 @@ void	choose_ray_tip(t_game *g)
 		g->rcd->tip_p->x = g->rcd->v_p->x;
 		g->rcd->tip_p->y = g->rcd->v_p->y;
 		g->rcd->wall_type = VERTICAL;
+	}
+}
+
+void	choose_ray_tip2(t_game *g)
+{
+	double	h_dist;
+	double	v_dist;
+
+	h_dist = sqrt(((g->mrcd->h_p->x - g->mrcd->p_p->x) * (g->mrcd->h_p->x - g->mrcd->p_p->x)) + 
+	              ((g->mrcd->h_p->y - g->mrcd->p_p->y) * (g->mrcd->h_p->y - g->mrcd->p_p->y)));
+	v_dist = sqrt(((g->mrcd->v_p->x - g->mrcd->p_p->x) * (g->mrcd->v_p->x - g->mrcd->p_p->x)) + 
+	              ((g->mrcd->v_p->y - g->mrcd->p_p->y) * (g->mrcd->v_p->y - g->mrcd->p_p->y)));
+	if (h_dist == 0)
+	{
+		g->mrcd->tip_p->x = g->mrcd->v_p->x;
+		g->mrcd->tip_p->y = g->mrcd->v_p->y;
+		g->mrcd->wall_type = VERTICAL;
+		return ;
+	}
+	else if (v_dist == 0)
+	{
+		g->mrcd->tip_p->x = g->mrcd->h_p->x;
+		g->mrcd->tip_p->y = g->mrcd->h_p->y;
+		g->mrcd->wall_type = HORIZONTAL;
+		return ;
+	}
+	else if (h_dist <= v_dist)
+	{
+		g->mrcd->tip_p->x = g->mrcd->h_p->x;
+		g->mrcd->tip_p->y = g->mrcd->h_p->y;
+		g->mrcd->wall_type = HORIZONTAL;
+	}
+	else
+	{
+		g->mrcd->tip_p->x = g->mrcd->v_p->x;
+		g->mrcd->tip_p->y = g->mrcd->v_p->y;
+		g->mrcd->wall_type = VERTICAL;
 	}
 }
 
@@ -378,6 +567,7 @@ void	init_ray_angles(t_game *g, double *ray_angles)
 		//start_angle += FOV / g->win_w;
 		i++;
 	}
+
 }
 
 void	calc_wall_dist(t_game *g, double ray_angle)
@@ -534,14 +724,10 @@ void	check_door_intercept(t_game *g)
 	check_y = g->rcd->tip_p->y;
 	if (g->rcd->wall_type == HORIZONTAL
 		&& g->rcd->p_p->y > g->rcd->tip_p->y)
-	{
 		check_y -= 1;
-	}
 	else if (g->rcd->wall_type == VERTICAL
 		&& g->rcd->p_p->x > g->rcd->tip_p->x)
-	{
 		check_x -= 1;
-	}
 	x = check_x / CUBE_SIZE;
 	y = check_y / CUBE_SIZE;
 	if (x < 0 || x > g->vars->p_data.width)
@@ -593,7 +779,13 @@ void	render_vision_ray(t_game *g)
 	}
 	exit(0);*/
 	init_raycast_data(g);
+	init_raycast_data2(g);
 	init_ray_angles(g, ray_angles);
+	g->ray_angles = ray_angles;
+	get_horizontal_intercept2(g, ray_angles[g->win_w / 2]);
+	get_vertical_intercept2(g, ray_angles[g->win_w / 2]);
+	choose_ray_tip2(g);
+	//printf("mid ray = %f %f\n", g->mrcd->tip_p->x, g->mrcd->tip_p->y);
 	//printf("g player angle = %f\ng rcd angle = %f\n", g->player.angle, g->rcd->angle);
 	//printf("player_dir = [%f]\nmid_ray = [%f]\n", g->rcd->angle, ray_angles[g->win_w / 4]);
 	int	j = 0;
@@ -634,6 +826,43 @@ void	render_vision_ray(t_game *g)
 		j += wall_x;
 	}
 	free(ray_angles);
+}
+
+void	use_door(t_game *g)
+{
+	int			map_x;
+	int			map_y;
+	char		**map;
+
+	map_x = g->mrcd->tip_p->x;
+	map_y = g->mrcd->tip_p->y;
+	if (g->mrcd->wall_type == HORIZONTAL && g->rcd->p_p->y > g->mrcd->tip_p->y)
+		map_y -= 1;
+	else if (g->mrcd->wall_type == VERTICAL && g->rcd->p_p->x > g->mrcd->tip_p->x)
+		map_x -= 1;
+	map_x = map_x / CUBE_SIZE;
+	map_y = map_y / CUBE_SIZE;
+	//map_x = g->mrcd->tip_p->x / CUBE_SIZE;
+	//map_y = g->mrcd->tip_p->y / CUBE_SIZE;
+	if (map_x < 0)
+		map_x = 0;
+	else if (map_x > g->vars->p_data.width)
+		map_x = g->vars->p_data.width;
+	if (map_y < 0)
+		map_y = 0;
+	else if (map_y > g->vars->p_data.height)
+		map_y = g->vars->p_data.height;
+	map = g->vars->p_data.matrix;
+	if (map[map_y][map_x] == 'D')
+		map[map_y][map_x] = 'O';
+	else if (map[map_y][map_x] == 'O')
+		map[map_y][map_x] = 'D';
+	int	i = 0;
+
+	while (map[i])
+		printf("%s\n", map[i++]);
+	//printf("%f\n", door.rcd->angle);
+	printf("%d, %d = %c\n", map_x, map_y, map[map_y][map_x]);
 }
 
 void	render_player(t_game *g)
@@ -830,6 +1059,8 @@ int pointer_motion(int x, int y, t_game *g)
 
 int	close_game(t_game *g)
 {
+	if (g->vars->p_data.has_door)
+		mlx_destroy_image(g->vars->mlx, g->d_img);
 	mlx_destroy_image(g->vars->mlx, g->e_img);
 	mlx_destroy_image(g->vars->mlx, g->n_img);
 	mlx_destroy_image(g->vars->mlx, g->w_img);
@@ -837,6 +1068,7 @@ int	close_game(t_game *g)
 	mlx_destroy_image(g->vars->mlx, g->img.img);
 	mlx_destroy_window(g->vars->mlx, g->vars->win);
 	mlx_destroy_display(g->vars->mlx);
+	free(g->vars->mlx);
 	gc_free_all();
 	return(exit(0), 0);
 }
