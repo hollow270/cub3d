@@ -111,6 +111,9 @@ typedef struct s_garbage
 
 typedef struct s_player
 {
+	double	bob_time;
+	double	bob_amplitude;
+	double	bob_frequency;
 	double	pos_x;
 	double	pos_y;
 	double	dir_x;

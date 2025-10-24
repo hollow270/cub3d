@@ -78,6 +78,10 @@ int check_new_position(double new_x, double new_y, t_game *g, int dir)
 
 int	controls(int keycode, t_game *g)
 {
+	if (keycode == 'w' || keycode == 'd' || keycode == 's' || keycode == 'a')
+		g->player.bob_time += 0.1;
+	else
+		g->player.bob_time *= 0.9;
 	if (keycode == 101)
 		use_door(g);
 	if (keycode == 65307)
@@ -1005,7 +1009,7 @@ void	render_map_background(t_game *g)
 	}
 }
 
-void	render_hell_yeah_pov(t_game *g)
+/*void	render_hell_yeah_pov(t_game *g)
 {
 	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->h_img, 0, 0);
 	int	image_x;
@@ -1027,6 +1031,31 @@ void	render_hell_yeah_pov(t_game *g)
 			image_x++;
 		}
 		image_y++;
+	}
+}*/
+
+void	render_hell_yeah_pov(t_game *g)
+{
+	int	image_x;
+	int	image_y;
+	int	offset_y;
+	int	source_pixel;
+	double	bob_offset;
+
+	// Calculate bob offset (only when moving)
+	bob_offset = g->player.bob_amplitude * sin(g->player.bob_frequency * g->player.bob_time);
+
+	// Clamp or round to avoid subpixel artifacts
+	offset_y = (int)bob_offset;
+
+	for (image_y = 0; image_y < 1000; image_y++)
+	{
+		for (image_x = 0; image_x < 1000; image_x++)
+		{
+			source_pixel = g->h_data[image_y * 1000 + image_x];
+			if (source_pixel != -16777216)
+				my_mlx_pixel_put(&g->img, image_x, image_y + offset_y, source_pixel);
+		}
 	}
 }
 
@@ -1144,6 +1173,9 @@ void	cube_init(t_vars *vars)
 	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
 	g->player.pos_x = (double) g->vars->p_data.p_x;
 	g->player.pos_y = (double) g->vars->p_data.p_y;
+	g->player.bob_time = 0;
+	g->player.bob_amplitude = 16;
+	g->player.bob_frequency = 5;
 	printf("parsed player direction = [%f]\n", g->vars->p_data.angle);
 	g->player.angle = g->vars->p_data.angle;
 	vars->mlx = mlx_init();
