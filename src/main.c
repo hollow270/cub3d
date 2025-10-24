@@ -29,7 +29,7 @@ void	use_door(t_game *g);
 #define SKY 0x87CEEB
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
-#define PX_SIZE 7
+#define PX_SIZE 1
 #define DOOR_OPEN_DIST 140
 #define WIN_W 1000
 #define WIN_H 1000
@@ -38,8 +38,10 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
 	if (x < 0 || y < 0 || x >= WIN_W || y >= WIN_H)
 		return ;
-	int *dst = img->data + (y * img->line_len + x * (img->bpp / 8));
-	*dst = color;
+	/*int *dst = img->data + (y * img->line_len + x * (img->bpp / 8));
+	*dst = color;*/
+	char *dst = (char *)img->data + (y * img->line_len + x * (img->bpp / 8));
+	*(unsigned int *)dst = color;
 }
 
 int	is_not_passable(int c)
@@ -159,7 +161,7 @@ void	render_ray_points(int x, int y, t_game *g, int color)
 		{
 			pixel_x = start_x + player_x - RAY_WIDTH / 2;
 			pixel_y = start_y + player_y - RAY_WIDTH / 2;
-			mlx_pixel_put(g->vars->mlx, g->vars->win, pixel_x, pixel_y, color);
+			my_mlx_pixel_put(&g->img, pixel_x, pixel_y, color);
 			//int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
 			//g->img.data[index] = color;
 			player_x++;
@@ -616,7 +618,7 @@ void	draw_ceiling(t_game *g, int c_x, int cs_y, int ce_y)
 				x++;
 				continue ;
 			}
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, SKY);
+			my_mlx_pixel_put(&g->img, x, y, SKY);
 			x++;
 		}
 		y++;
@@ -635,7 +637,7 @@ void	draw_ground(t_game *g, int g_x, int gs_y, int ge_y)
 		x = g_x;
 		while (x < g_x + PX_SIZE)
 		{
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, GROUND);
+			my_mlx_pixel_put(&g->img, x, y, GROUND);
 			x++;
 		}
 		y++;
@@ -673,7 +675,7 @@ void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
 				continue ;
 			}
 			//if (x >= g->minimap_w && y >= g->minimap_h)
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, g->chosen_tx[tx_y * CUBE_SIZE + tx_x]);
+			my_mlx_pixel_put(&g->img, x, y, g->chosen_tx[tx_y * CUBE_SIZE + tx_x]);
 			//printf("width = %d\nheight = %d\n", g->minimap_w, g->minimap_h);
 			x++;
 		}
@@ -695,12 +697,12 @@ void	draw_stripe(t_game *g, int w_x, int ws_y, int we_y)
 	/*while (y <= we_y)
 	{
 		x = w_x;
-		//mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
+		//my_mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
 		while (x < w_x + PX_SIZE)
 		{
 			//printf("drawing at [%d, %d]\n", x, y);
 			//random_color = rand() % 0xFFFFFF;
-			mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
+			my_mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
 			x++;
 		}
 		y++;
@@ -910,7 +912,7 @@ void	render_player(t_game *g)
 		{
 			pixel_x = start_player_x + player_x - PLAYER_SIZE / 2;
 			pixel_y = start_player_y + player_y - PLAYER_SIZE / 2;
-			mlx_pixel_put(g->vars->mlx, g->vars->win, pixel_x, pixel_y, PLAYER_COLOR);
+			my_mlx_pixel_put(&g->img, pixel_x, pixel_y, PLAYER_COLOR);
 			//int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
 			//g->img.data[index] = PLAYER_COLOR;
 			player_x++;
@@ -962,7 +964,7 @@ void	render_map(t_game *g)
 						// calculate the current cube coordinates reached
 						pixel_x = start_cube_x + cube_x;
 						pixel_y = start_cube_y + cube_y;
-						mlx_pixel_put(g->vars->mlx, g->vars->win, pixel_x, pixel_y, WHITE);
+						my_mlx_pixel_put(&g->img, pixel_x, pixel_y, WHITE);
 						// convert 2d coordinates to 1d coordinate
 						//index = pixel_y * (g->img.line_len / 4) + pixel_x;
 						//g->img.data[index] = WHITE;
@@ -996,7 +998,7 @@ void	render_map_background(t_game *g)
 		while (x < g->minimap_w)
 		{
 			if (isnt_wall(map[y / MINIMAP_SIZE][x / MINIMAP_SIZE]))
-				mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, GROUND);
+				my_mlx_pixel_put(&g->img, x, y, GROUND);
 			x++;
 		}
 		y++;
@@ -1021,7 +1023,7 @@ void	render_hell_yeah_pov(t_game *g)
 			source_pixel = g->h_data[image_y * 1000 + image_x];
 			//printf("source pixel = %d\n", source_pixel);
 			if (source_pixel != -16777216)
-				mlx_pixel_put(g->vars->mlx, g->vars->win, image_x, image_y, source_pixel);
+				my_mlx_pixel_put(&g->img, image_x, image_y, source_pixel);
 			image_x++;
 		}
 		image_y++;
@@ -1046,7 +1048,7 @@ int	render(t_game *g)
 	render_vision_ray(g);
 	render_hell_yeah_pov(g);
 	//printf("player = [%f, %f]\n", g->player.pos_x, g->player.pos_y);
-	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
+	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
 }
 
 /*int	pointer_motion(int x, int y, t_game *g)
