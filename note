@@ -1,20 +1,41 @@
-2. Determine Wall Direction in render_vision_ray
-After calling choose_ray_tip(), you need to figure out which wall face was hit. Add logic like:
-Check if horizontal or vertical wall hit:
+Here’s a quick and concise performance breakdown 👇
+🔥 Major performance bottlenecks
 
-Compare h_dist vs v_dist (you already do this in choose_ray_tip)
-Store which type was chosen (horizontal or vertical)
+mlx_pixel_put (in draw_wall, draw_ceiling, draw_ground, and render_ray_points)
 
-Determine compass direction:
-For horizontal walls:
+Biggest CPU killer — it sends one X11 call per pixel (very slow).
 
-If ray angle is 0° to 180° (pointing down): You hit a NORTH face
-If ray angle is 180° to 360° (pointing up): You hit a SOUTH face
+You’re calling it thousands to millions of times per frame.
 
-For vertical walls:
+Should be replaced with buffered drawing using mlx_new_image, direct pixel writes, then mlx_put_image_to_window() once per frame.
 
-If cos(ray_angle) > 0 (pointing right): You hit a WEST face
-If cos(ray_angle) < 0 (pointing left): You hit an EAST face
+Math-heavy loops (raycasting)
 
+get_horizontal_intercept() and get_vertical_intercept() do up to 100 iterations per ray × WIN_W rays (1000) → ~100,000 map lookups per frame.
 
-formula: radian * 180 / PI
+Each uses tan(), sin(), cos(), sqrt() → these are expensive.
+
+gc_malloc in ray init functions
+
+Allocating memory per frame (init_raycast_data, etc.) causes fragmentation and slows things down. Should be allocated once and reused.
+📊 mlx_pixel_put call count per frame
+
+draw_wall: ~WIN_W × wall_height × PX_SIZE²
+(≈ 1000 × ~300 × 1 = ~300k calls)
+
+draw_ceiling + draw_ground: together cover the rest of the screen
+(≈ WIN_W × WIN_H × PX_SIZE² = 1,000,000 calls if they redraw everything)
+
+render_ray_points: adds some more if you visualize rays on minimap (negligible compared to above).
+
+✅ Total per frame ≈ 1–1.5 million mlx_pixel_put calls, which is completely unsustainable in real-time rendering.
+💡 Fix summary
+
+Replace all per-pixel mlx_pixel_put() calls with direct writes to an image buffer (g->img.data).
+
+Reuse allocated ray structs.
+
+Precompute sin/cos tables for angles.
+TL;DR:
+mlx_pixel_put is the main bottleneck (~1M calls/frame).
+Math loops (tan/sqrt/sin/cos) and per-frame allocations worsen it

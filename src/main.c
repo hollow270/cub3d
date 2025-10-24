@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/27 17:32:44 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/10/23 23:18:30 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,18 @@ void	use_door(t_game *g);
 #define SKY 0x87CEEB
 #define BLACK 0x000000
 #define PLAYER_COLOR 0xFF0000
-#define PX_SIZE 3
+#define PX_SIZE 7
 #define DOOR_OPEN_DIST 140
+#define WIN_W 1000
+#define WIN_H 1000
+
+void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
+{
+	if (x < 0 || y < 0 || x >= WIN_W || y >= WIN_H)
+		return ;
+	int *dst = img->data + (y * img->line_len + x * (img->bpp / 8));
+	*dst = color;
+}
 
 int	is_not_passable(int c)
 {
@@ -780,7 +790,7 @@ void	render_vision_ray(t_game *g)
 	int		i;
 	double	*ray_angles;
 
-	ray_angles = malloc(sizeof(double) * g->win_w);
+	//ray_angles = malloc(sizeof(double) * g->win_w);
 	/*int	j = 0;
 	while (j < g->win_w)
 	{
@@ -788,10 +798,11 @@ void	render_vision_ray(t_game *g)
 		j++;
 	}
 	exit(0);*/
-	init_raycast_data(g);
-	init_raycast_data2(g);
-	init_ray_angles(g, ray_angles);
-	g->ray_angles = ray_angles;
+	//init_raycast_data(g);
+	//init_raycast_data2(g);
+	init_ray_angles(g, g->ray_angles);
+	ray_angles = g->ray_angles;
+	//g->ray_angles = ray_angles;
 	get_horizontal_intercept2(g, ray_angles[g->win_w / 2]);
 	get_vertical_intercept2(g, ray_angles[g->win_w / 2]);
 	choose_ray_tip2(g);
@@ -836,7 +847,7 @@ void	render_vision_ray(t_game *g)
 		//render_point_debug(g, g->rcd->v_p->x, g->rcd->v_p->y, 0x008000);
 		j += wall_x;
 	}
-	free(ray_angles);
+	//free(ray_angles);
 }
 
 void	use_door(t_game *g)
@@ -992,6 +1003,31 @@ void	render_map_background(t_game *g)
 	}
 }
 
+void	render_hell_yeah_pov(t_game *g)
+{
+	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->h_img, 0, 0);
+	int	image_x;
+	int	image_y;
+	int	screen_x;
+	int	screen_y;
+	int	source_pixel;
+
+	image_y = 0;
+	while (image_y < 1000)
+	{
+		image_x = 0;
+		while (image_x < 1000)
+		{
+			source_pixel = g->h_data[image_y * 1000 + image_x];
+			//printf("source pixel = %d\n", source_pixel);
+			if (source_pixel != -16777216)
+				mlx_pixel_put(g->vars->mlx, g->vars->win, image_x, image_y, source_pixel);
+			image_x++;
+		}
+		image_y++;
+	}
+}
+
 int	render(t_game *g)
 {
 	/*int	i;
@@ -1004,7 +1040,11 @@ int	render(t_game *g)
 	render_map_background(g);
 	render_map(g);
 	render_player(g);
+	init_raycast_data(g);
+	init_raycast_data2(g);
+	g->ray_angles = gc_malloc(sizeof(double) * g->win_w);
 	render_vision_ray(g);
+	render_hell_yeah_pov(g);
 	//printf("player = [%f, %f]\n", g->player.pos_x, g->player.pos_y);
 	//mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
 }
@@ -1089,12 +1129,14 @@ void	cube_init(t_vars *vars)
 	t_game	*g = gc_malloc(sizeof(t_game));
 	int		width = CUBE_SIZE;
 	int		height = CUBE_SIZE;
+	int		h_width = WIN_W;
+	int		h_height = WIN_H;
 
 	g->vars = vars;
 	//g->win_w = vars->p_data.width * 64;
 	//g->win_h = vars->p_data.height * 64;
-	g->win_w = 600;
-	g->win_h = 600;
+	g->win_w = WIN_W;
+	g->win_h = WIN_H;
 	g->minimap_w = g->vars->p_data.width * MINIMAP_SIZE;
 	g->minimap_h = g->vars->p_data.height * MINIMAP_SIZE;
 	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
@@ -1112,12 +1154,14 @@ void	cube_init(t_vars *vars)
 	g->w_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->west_wall, &width, &height);
 	if (g->vars->p_data.has_door)
 		g->d_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->door, &width, &height);
+	g->h_img = mlx_xpm_file_to_image(g->vars->mlx, "./assets/hell_yeah_pov.xpm", &h_width, &h_height);
 	g->n_data = (int *)mlx_get_data_addr(g->n_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->e_data = (int *)mlx_get_data_addr(g->e_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->s_data = (int *)mlx_get_data_addr(g->s_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->w_data = (int *)mlx_get_data_addr(g->w_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	if (g->vars->p_data.has_door)
 		g->d_data = (int *)mlx_get_data_addr(g->d_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	g->h_data = (int *)mlx_get_data_addr(g->h_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->mouse_control = false;
 	mlx_loop_hook(g->vars->mlx, render, g);
 	mlx_hook(vars->win, 2, 1L<<0, controls, g);

@@ -48,6 +48,7 @@ typedef struct s_assets
 	char	*east_wall;
 	char	*south_wall;
 	char	*west_wall;
+	char	*hell_yeah;
 	char	*door;
 	int		f_rgb[3];
 	int		c_rgb[3];
@@ -146,11 +147,13 @@ typedef struct s_game
 	void		*s_img;
 	void		*w_img;
 	void		*d_img;
+	void		*h_img;
 	int			*n_data;
 	int			*e_data;
 	int			*s_data;
 	int			*w_data;
 	int			*d_data;
+	int			*h_data;
 	int			*chosen_tx;
 	double		*ray_angles;
 	bool		mouse_control;
