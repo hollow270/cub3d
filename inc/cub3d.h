@@ -28,6 +28,30 @@
 # define SO_WALL "./assets/south_wall.xpm"
 # define WE_WALL "./assets/west_wall.xpm"
 
+typedef struct s_minimap
+{
+	int		map_x;
+	int		map_y;
+	int		pixel_x;
+	int		pixel_y;
+	int		cube_x;
+	int		cube_y;
+	int		start_cube_x;
+	int		start_cube_y;
+	char	**map;
+}			t_minimap;
+
+typedef struct s_player_mp
+{
+	char	**map;
+	int		start_player_x;
+	int		start_player_y;
+	int		player_x;
+	int		player_y;
+	int		pixel_x;
+	int		pixel_y;
+}			t_player_mp;
+
 typedef enum e_wall_type
 {
 	VERTICAL,

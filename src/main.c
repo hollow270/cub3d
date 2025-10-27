@@ -28,8 +28,9 @@ void	use_door(t_game *g);
 #define GROUND 0x2b2b2a
 #define SKY 0x87CEEB
 #define BLACK 0x000000
+#define BROWN 0x964B00
 #define PLAYER_COLOR 0xFF0000
-#define PX_SIZE 1
+#define PX_SIZE 5
 #define DOOR_OPEN_DIST 140
 #define WIN_W 1000
 #define WIN_H 1000
@@ -870,8 +871,6 @@ void	use_door(t_game *g)
 		map_x -= 1;
 	map_x = map_x / CUBE_SIZE;
 	map_y = map_y / CUBE_SIZE;
-	//map_x = g->mrcd->tip_p->x / CUBE_SIZE;
-	//map_y = g->mrcd->tip_p->y / CUBE_SIZE;
 	if (map_x < 0)
 		map_x = 0;
 	else if (map_x > g->vars->p_data.width)
@@ -885,101 +884,79 @@ void	use_door(t_game *g)
 		map[map_y][map_x] = 'O';
 	else if (map[map_y][map_x] == 'O' && g->mrcd->tip_dist < DOOR_OPEN_DIST)
 		map[map_y][map_x] = 'D';
-	int	i = 0;
-
-	while (map[i])
-		printf("%s\n", map[i++]);
-	//printf("%f\n", door.rcd->angle);
-	printf("%d, %d = %c\ndistance = %f\n", map_x, map_y, map[map_y][map_x], g->mrcd->tip_dist);
 }
 
 void	render_player(t_game *g)
 {
-	int		start_player_x;
-	int		start_player_y;
+	t_player_mp	pmp;
 
-	int		player_x;
-	int		player_y;
-
-	int		pixel_x;
-	int		pixel_y;
-
-	char	**map = g->vars->p_data.matrix;
-
-	start_player_x = g->player.pos_x * MINIMAP_SIZE;
-	start_player_y = g->player.pos_y * MINIMAP_SIZE;
-	player_y = 0;
-	while (player_y < PLAYER_SIZE)
+	pmp.map = g->vars->p_data.matrix;
+	pmp.start_player_x = g->player.pos_x * MINIMAP_SIZE;
+	pmp.start_player_y = g->player.pos_y * MINIMAP_SIZE;
+	pmp.player_y = 0;
+	while (pmp.player_y < PLAYER_SIZE)
 	{
-		player_x = 0;
-		while (player_x < PLAYER_SIZE)
+		pmp.player_x = 0;
+		while (pmp.player_x < PLAYER_SIZE)
 		{
-			pixel_x = start_player_x + player_x - PLAYER_SIZE / 2;
-			pixel_y = start_player_y + player_y - PLAYER_SIZE / 2;
-			my_mlx_pixel_put(&g->img, pixel_x, pixel_y, PLAYER_COLOR);
-			//int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
-			//g->img.data[index] = PLAYER_COLOR;
-			player_x++;
+			pmp.pixel_x = pmp.start_player_x + pmp.player_x - PLAYER_SIZE / 2;
+			pmp.pixel_y = pmp.start_player_y + pmp.player_y - PLAYER_SIZE / 2;
+			my_mlx_pixel_put(&g->img, pmp.pixel_x, pmp.pixel_y, PLAYER_COLOR);
+			pmp.player_x++;
 		}
-		player_y++;
+		pmp.player_y++;
+	}
+}
+
+void	draw_mp_pixel(t_game *g, t_minimap *mp)
+{
+	mp->pixel_x = mp->start_cube_x + mp->cube_x;
+	mp->pixel_y = mp->start_cube_y + mp->cube_y;
+	if (mp->map[mp->map_y][mp->map_x] == 'D')
+		my_mlx_pixel_put(&g->img, mp->pixel_x, mp->pixel_y, BROWN);
+	else if (mp->map[mp->map_y][mp->map_x] == 'O')
+		my_mlx_pixel_put(&g->img, mp->pixel_x, mp->pixel_y, GROUND);
+	else
+		my_mlx_pixel_put(&g->img, mp->pixel_x, mp->pixel_y, WHITE);
+}
+
+void	draw_mp_square(t_game *g, t_minimap *mp)
+{
+	while (mp->cube_y < MINIMAP_SIZE)
+	{
+		mp->cube_x = 0;
+		while (mp->cube_x < MINIMAP_SIZE)
+		{
+			draw_mp_pixel(g, mp);
+			mp->cube_x++;
+		}
+		mp->cube_y++;
 	}
 }
 
 void	render_map(t_game *g)
 {
-	// char **map line coordinates
-	int	map_x;
-	int	map_y;
-	// mlx window pixels coordinates
-	int	pixel_x;
-	int	pixel_y;
-	// coordinates of the cube currently being drawn in the two last while loops
-	int	cube_x;
-	int	cube_y;
-	// coordinates of the first pixel in the cube to draw in each loop
-	int	start_cube_x;
-	int	start_cube_y;
-	// index needed to know where to change the pixels in the mlx img int *data array
-	int	index;
-	// parsed char **map from the parsing part
-	char	**map;
+	t_minimap mp;
 
-	map_y = 0;
-	map = g->vars->p_data.matrix;
-	// looping through the char **map first
-	while (map[map_y])
+	mp.map_y = 0;
+	mp.map = g->vars->p_data.matrix;
+	while (mp.map[mp.map_y])
 	{
-		map_x = 0;
-		while (map[map_y][map_x])
+		mp.map_x = 0;
+		while (mp.map[mp.map_y][mp.map_x])
 		{
-			// check if the current char in char **map is '1'
-			if (map[map_y][map_x] == '1')
+			if (mp.map[mp.map_y][mp.map_x] == '1'
+				|| mp.map[mp.map_y][mp.map_x] == 'D'
+				|| mp.map[mp.map_y][mp.map_x] == 'O')
 			{
-				// calculate the position from which we should start drawing the cube
-				start_cube_x = map_x * MINIMAP_SIZE; 
-				start_cube_y = map_y * MINIMAP_SIZE;
-				// loop through the cube coordinates
-				cube_y = 0;
-				while (cube_y < MINIMAP_SIZE)
-				{
-					cube_x = 0;
-					while (cube_x < MINIMAP_SIZE)
-					{
-						// calculate the current cube coordinates reached
-						pixel_x = start_cube_x + cube_x;
-						pixel_y = start_cube_y + cube_y;
-						my_mlx_pixel_put(&g->img, pixel_x, pixel_y, WHITE);
-						// convert 2d coordinates to 1d coordinate
-						//index = pixel_y * (g->img.line_len / 4) + pixel_x;
-						//g->img.data[index] = WHITE;
-						cube_x++;
-					}
-					cube_y++;
-				}
+				mp.start_cube_x = mp.map_x * MINIMAP_SIZE; 
+				mp.start_cube_y = mp.map_y * MINIMAP_SIZE;
+				mp.cube_y = 0;
+				draw_mp_square(g, &mp);
 			}
-			map_x++;
+			mp.map_x++;
 		}
-		map_y++;
+		mp.map_y++;
 	}
 }
 
@@ -1080,47 +1057,15 @@ int	render(t_game *g)
 	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
 }
 
-/*int	pointer_motion(int x, int y, t_game *g)
-{
-	static int	prv_x;
-	int			diff;
-	int			rot_angle;
-
-	printf("motion = [%d]\n", x - g->win_w / 2);
-	diff = prv_x - x;
-	rot_angle = diff * 0.3;
-	g->player.angle -= rot_angle;
-	prv_x = x;
-}*/
-
-/*int pointer_motion(int x, int y, t_game *g)
-{
-    static int prv_x = -1;
-    int diff;
-    
-    if (prv_x == -1) // First frame
-        prv_x = x;
-    
-    diff = prv_x - x;
-    g->player.angle -= diff * 0.3;
-    
-    // Normalize angle
-    if (g->player.angle < 0)
-        g->player.angle += 360;
-    else if (g->player.angle >= 360)
-        g->player.angle -= 360;
-    
-    prv_x = x;
-    return (0);
-}*/
-
 int pointer_motion(int x, int y, t_game *g)
 {
-    static int first_motion = 1;
-    int center_x = g->win_w / 2;
-    int center_y = g->win_h / 2;
-    int diff;
+    static int	first_motion = 1;
+    int			center_x;
+    int			center_y;
+    int			diff;
 
+	center_x = g->win_w / 2;
+	center_y = g->win_h / 2;
 	if (g->mouse_control == 0)
 		return (0);
     if (first_motion)
@@ -1155,33 +1100,13 @@ int	close_game(t_game *g)
 	return(exit(0), 0);
 }
 
-void	cube_init(t_vars *vars)
+void	init_sprites(t_game *g)
 {
-	t_game	*g = gc_malloc(sizeof(t_game));
-	int		width = CUBE_SIZE;
-	int		height = CUBE_SIZE;
-	int		h_width = WIN_W;
-	int		h_height = WIN_H;
+	int	width;
+	int	height;
+	int	h_width;
+	int	h_height;
 
-	g->vars = vars;
-	//g->win_w = vars->p_data.width * 64;
-	//g->win_h = vars->p_data.height * 64;
-	g->win_w = WIN_W;
-	g->win_h = WIN_H;
-	g->minimap_w = g->vars->p_data.width * MINIMAP_SIZE;
-	g->minimap_h = g->vars->p_data.height * MINIMAP_SIZE;
-	printf("window dimensions = [%dx%d]\n", g->win_w, g->win_h);
-	g->player.pos_x = (double) g->vars->p_data.p_x;
-	g->player.pos_y = (double) g->vars->p_data.p_y;
-	g->player.bob_time = 0;
-	g->player.bob_amplitude = 16;
-	g->player.bob_frequency = 5;
-	printf("parsed player direction = [%f]\n", g->vars->p_data.angle);
-	g->player.angle = g->vars->p_data.angle;
-	vars->mlx = mlx_init();
-	vars->win = mlx_new_window(vars->mlx, g->win_w, g->win_h, "Dungeon gayme");
-	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);
-	g->img.data = (int *)mlx_get_data_addr(g->img.img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->n_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->north_wall, &width, &height);
 	g->e_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->east_wall, &width, &height);
 	g->s_img = mlx_xpm_file_to_image(g->vars->mlx, g->vars->p_data.assets->south_wall, &width, &height);
@@ -1196,13 +1121,39 @@ void	cube_init(t_vars *vars)
 	if (g->vars->p_data.has_door)
 		g->d_data = (int *)mlx_get_data_addr(g->d_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->h_data = (int *)mlx_get_data_addr(g->h_img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+}
+
+void	init_game_data(t_game *g, t_vars *vars)
+{
+	g->vars = vars;
+	g->win_w = WIN_W;
+	g->win_h = WIN_H;
+	g->minimap_w = g->vars->p_data.width * MINIMAP_SIZE;
+	g->minimap_h = g->vars->p_data.height * MINIMAP_SIZE;
+	g->player.pos_x = (double) g->vars->p_data.p_x;
+	g->player.pos_y = (double) g->vars->p_data.p_y;
+	g->player.bob_time = 0;
+	g->player.bob_amplitude = 16;
+	g->player.bob_frequency = 5;
+	g->player.angle = g->vars->p_data.angle;
+}
+
+void	cube_init(t_vars *vars)
+{
+	t_game	*g = gc_malloc(sizeof(t_game));
+
+	init_game_data(g, vars);
+	vars->mlx = mlx_init();
+	vars->win = mlx_new_window(vars->mlx, g->win_w, g->win_h, "Hell Yeah Simulator");
+	g->img.img = mlx_new_image(g->vars->mlx, g->win_w, g->win_h);
+	g->img.data = (int *)mlx_get_data_addr(g->img.img, &g->img.bpp, &g->img.line_len, &g->img.endian);
+	init_sprites(g);
 	g->mouse_control = false;
 	mlx_loop_hook(g->vars->mlx, render, g);
 	mlx_hook(vars->win, 2, 1L<<0, controls, g);
 	mlx_hook(vars->win, DestroyNotify, 0, close_game, g);
 	mlx_hook(vars->win, MotionNotify, PointerMotionMask, pointer_motion, g);
-	//mlx_mouse_hide(vars->mlx, vars->win);  // Hide cursor
-    mlx_mouse_move(vars->mlx, vars->win, g->win_w / 2, g->win_h / 2); // Center it
+    mlx_mouse_move(vars->mlx, vars->win, g->win_w / 2, g->win_h / 2);
 	mlx_loop(vars->mlx);
 	render(g);
 }
