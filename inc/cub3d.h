@@ -52,6 +52,15 @@ typedef struct s_player_mp
 	int		pixel_y;
 }			t_player_mp;
 
+typedef struct s_wall_ctx
+{
+	double	progress;
+	int		x;
+	int		y;
+	int		tx_x;
+	int		tx_y;
+}			t_wall_ctx;
+
 typedef enum e_wall_type
 {
 	VERTICAL,

@@ -413,20 +413,16 @@ void	get_vertical_intercept2(t_game *g, double angle)
 		g->mrcd->v_p->y = g->mrcd->p_p->y;
 		return;
 	}
-
-	// Ray pointing right (0° direction)
 	if (cos(angle) > 0)
 	{
 		g->mrcd->v_p->x = ceil(g->mrcd->p_p->x / 64) * 64;
-		// If exactly on grid line, move one step forward
 		if (g->mrcd->v_p->x == g->mrcd->p_p->x)
 			g->mrcd->v_p->x += 64;
 		x_step = 64;
 	}
-	else  // Ray pointing left (180° direction)
+	else
 	{
 		g->mrcd->v_p->x = floor(g->mrcd->p_p->x / 64) * 64;
-		// If exactly on grid line, move one step back
 		if (g->mrcd->v_p->x == g->mrcd->p_p->x)
 			g->mrcd->v_p->x -= 64;
 		x_step = -64;
@@ -451,41 +447,34 @@ void	get_vertical_intercept2(t_game *g, double angle)
 	}
 }
 
+void	set_tip(t_pos *dst, t_pos *src, t_wall_type *wall_type_dst, t_wall_type wall_type)
+{
+	dst->x = src->x;
+	dst->y = src->y;
+	*wall_type_dst = wall_type;
+}
+
+double	calc_dist(t_pos *p1, t_pos *p2)
+{
+	double	dx;
+	double	dy;
+
+	dx = p1->x - p2->x;
+	dy = p1->y - p2->y;
+	return (sqrt(dx * dx + dy * dy));
+}
+
 void	choose_ray_tip(t_game *g)
 {
 	double	h_dist;
 	double	v_dist;
 
-	h_dist = sqrt(((g->rcd->h_p->x - g->rcd->p_p->x) * (g->rcd->h_p->x - g->rcd->p_p->x)) + 
-	              ((g->rcd->h_p->y - g->rcd->p_p->y) * (g->rcd->h_p->y - g->rcd->p_p->y)));
-	v_dist = sqrt(((g->rcd->v_p->x - g->rcd->p_p->x) * (g->rcd->v_p->x - g->rcd->p_p->x)) + 
-	              ((g->rcd->v_p->y - g->rcd->p_p->y) * (g->rcd->v_p->y - g->rcd->p_p->y)));
-	if (h_dist == 0)
-	{
-		g->rcd->tip_p->x = g->rcd->v_p->x;
-		g->rcd->tip_p->y = g->rcd->v_p->y;
-		g->rcd->wall_type = VERTICAL;
-		return ;
-	}
-	else if (v_dist == 0)
-	{
-		g->rcd->tip_p->x = g->rcd->h_p->x;
-		g->rcd->tip_p->y = g->rcd->h_p->y;
-		g->rcd->wall_type = HORIZONTAL;
-		return ;
-	}
-	else if (h_dist <= v_dist)
-	{
-		g->rcd->tip_p->x = g->rcd->h_p->x;
-		g->rcd->tip_p->y = g->rcd->h_p->y;
-		g->rcd->wall_type = HORIZONTAL;
-	}
+	h_dist = calc_dist(g->rcd->h_p, g->rcd->p_p);
+	v_dist = calc_dist(g->rcd->v_p, g->rcd->p_p);
+	if (h_dist == 0 || (v_dist != 0 && h_dist <= v_dist))
+		set_tip(g->rcd->tip_p, g->rcd->h_p, &g->rcd->wall_type, HORIZONTAL);
 	else
-	{
-		g->rcd->tip_p->x = g->rcd->v_p->x;
-		g->rcd->tip_p->y = g->rcd->v_p->y;
-		g->rcd->wall_type = VERTICAL;
-	}
+		set_tip(g->rcd->tip_p, g->rcd->v_p, &g->rcd->wall_type, VERTICAL);
 }
 
 void	choose_ray_tip2(t_game *g)
@@ -493,73 +482,12 @@ void	choose_ray_tip2(t_game *g)
 	double	h_dist;
 	double	v_dist;
 
-	h_dist = sqrt(((g->mrcd->h_p->x - g->mrcd->p_p->x) * (g->mrcd->h_p->x - g->mrcd->p_p->x)) + 
-	              ((g->mrcd->h_p->y - g->mrcd->p_p->y) * (g->mrcd->h_p->y - g->mrcd->p_p->y)));
-	v_dist = sqrt(((g->mrcd->v_p->x - g->mrcd->p_p->x) * (g->mrcd->v_p->x - g->mrcd->p_p->x)) + 
-	              ((g->mrcd->v_p->y - g->mrcd->p_p->y) * (g->mrcd->v_p->y - g->mrcd->p_p->y)));
-	if (h_dist == 0)
-	{
-		g->mrcd->tip_p->x = g->mrcd->v_p->x;
-		g->mrcd->tip_p->y = g->mrcd->v_p->y;
-		g->mrcd->wall_type = VERTICAL;
-		return ;
-	}
-	else if (v_dist == 0)
-	{
-		g->mrcd->tip_p->x = g->mrcd->h_p->x;
-		g->mrcd->tip_p->y = g->mrcd->h_p->y;
-		g->mrcd->wall_type = HORIZONTAL;
-		return ;
-	}
-	else if (h_dist <= v_dist)
-	{
-		g->mrcd->tip_p->x = g->mrcd->h_p->x;
-		g->mrcd->tip_p->y = g->mrcd->h_p->y;
-		g->mrcd->wall_type = HORIZONTAL;
-	}
+	h_dist = calc_dist(g->mrcd->h_p, g->mrcd->p_p);
+	v_dist = calc_dist(g->mrcd->v_p, g->mrcd->p_p);
+	if (h_dist == 0 || (v_dist != 0 && h_dist <= v_dist))
+		set_tip(g->mrcd->tip_p, g->mrcd->h_p, &g->mrcd->wall_type, HORIZONTAL);
 	else
-	{
-		g->mrcd->tip_p->x = g->mrcd->v_p->x;
-		g->mrcd->tip_p->y = g->mrcd->v_p->y;
-		g->mrcd->wall_type = VERTICAL;
-	}
-}
-
-void	render_point_debug(t_game *g, int x, int y, int color)
-{
-	int		start_player_x;
-	int		start_player_y;
-
-	int		player_x;
-	int		player_y;
-
-	int		pixel_x;
-	int		pixel_y;
-
-	start_player_x = x;
-	start_player_y = y;
-	if (x > g->win_w)
-		start_player_x = g->win_w;
-	else if (x < 0)
-		start_player_x = 0;
-	if (y > g->win_h)
-		start_player_y = g->win_h;
-	else if (y < 0)
-		start_player_y = 0;
-	player_y = 0;
-	while (player_y < PLAYER_SIZE)
-	{
-		player_x = 0;
-		while (player_x < PLAYER_SIZE)
-		{
-			pixel_x = start_player_x + player_x;
-			pixel_y = start_player_y + player_y;
-			int	index = pixel_y * (g->img.line_len / 4) + pixel_x;
-			g->img.data[index] = color;
-			player_x++;
-		}
-		player_y++;
-	}
+		set_tip(g->mrcd->tip_p, g->mrcd->v_p, &g->mrcd->wall_type, VERTICAL);
 }
 
 void	init_ray_angles(t_game *g, double *ray_angles)
@@ -568,9 +496,7 @@ void	init_ray_angles(t_game *g, double *ray_angles)
 	double	start_angle;
 
 	i = 0;
-	//start_angle = (((double)FOV / 2) * -1);
 	start_angle = g->player.angle + (((double)FOV / 2) * -1);
-	//printf("start_angle = [%f]\nplayer_angle = [%f]\n", start_angle, g->rcd->angle);
 	while (i < g->win_w)
 	{
 		if (i == 0)
@@ -582,7 +508,6 @@ void	init_ray_angles(t_game *g, double *ray_angles)
 		else if (ray_angles[i] >= 2 * PI)
 			ray_angles[i] = ray_angles[i] - (2 * PI);
 		start_angle += ((double)FOV / (double)g->win_w);
-		//start_angle += FOV / g->win_w;
 		i++;
 	}
 
@@ -649,42 +574,40 @@ void	draw_ground(t_game *g, int g_x, int gs_y, int ge_y)
 	}
 }
 
+void	draw_pixel_from_sprite(t_game *g, t_wall_ctx *wctx, int w_x, int ws_y)
+{
+	wctx->progress = (double)(wctx->y - ws_y) / (double)g->rcd->wall_height;
+	wctx->tx_y = (int)(wctx->progress * CUBE_SIZE - 1);
+	if (wctx->tx_y < 0)
+		wctx->tx_y = 0;
+	else if (wctx->tx_y > 63)
+		wctx->tx_y = 63;
+	wctx->x = w_x;
+	while (wctx->x < w_x + PX_SIZE)
+	{
+		if (wctx->y < g->minimap_h && wctx->x < g->minimap_w)
+		{
+			wctx->x++;
+			continue ;
+		}
+		my_mlx_pixel_put(&g->img, wctx->x, wctx->y, g->chosen_tx[wctx->tx_y * CUBE_SIZE + wctx->tx_x]);
+		wctx->x++;
+	}
+}
+
 void	draw_wall(t_game *g, int w_x, int ws_y, int we_y)
 {
-	int		x;
-	int		y;
-	int		tx_x;
-	int		tx_y;
-	double	progress;
+	t_wall_ctx	wctx;
 
 	if (g->rcd->wall_type == HORIZONTAL)
-		tx_x = (int)(g->rcd->tip_p->x) % CUBE_SIZE;
+		wctx.tx_x = (int)(g->rcd->tip_p->x) % CUBE_SIZE;
 	else
-		tx_x = (int)(g->rcd->tip_p->y) % CUBE_SIZE;
-	y = ws_y;
-	while (y <= we_y)
+		wctx.tx_x = (int)(g->rcd->tip_p->y) % CUBE_SIZE;
+	wctx.y = ws_y;
+	while (wctx.y <= we_y)
 	{
-		progress = (double)(y - ws_y) / (double)g->rcd->wall_height;
-		//printf("progress = %f\n", progress);
-		tx_y = (int)(progress * CUBE_SIZE - 1);
-		if (tx_y < 0)
-			tx_y = 0;
-		else if (tx_y > 63)
-			tx_y = 63;
-		x = w_x;
-		while (x < w_x + PX_SIZE)
-		{
-			if (y < g->minimap_h && x < g->minimap_w)
-			{
-				x++;
-				continue ;
-			}
-			//if (x >= g->minimap_w && y >= g->minimap_h)
-			my_mlx_pixel_put(&g->img, x, y, g->chosen_tx[tx_y * CUBE_SIZE + tx_x]);
-			//printf("width = %d\nheight = %d\n", g->minimap_w, g->minimap_h);
-			x++;
-		}
-		y++;
+		draw_pixel_from_sprite(g, &wctx, w_x, ws_y);
+		wctx.y++;
 	}
 }
 
@@ -692,26 +615,11 @@ void	draw_stripe(t_game *g, int w_x, int ws_y, int we_y)
 {
 	int	x;
 	int	y;
-	//int	random_color;
 
 	x = w_x;
 	y = ws_y;
-	//printf("x = [%d]\n", x);
 	draw_ceiling(g, w_x, 0, ws_y);
 	draw_wall(g, w_x, ws_y, we_y);
-	/*while (y <= we_y)
-	{
-		x = w_x;
-		//my_mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
-		while (x < w_x + PX_SIZE)
-		{
-			//printf("drawing at [%d, %d]\n", x, y);
-			//random_color = rand() % 0xFFFFFF;
-			my_mlx_pixel_put(g->vars->mlx, g->vars->win, x, y, WHITE);
-			x++;
-		}
-		y++;
-	}*/
 	draw_ground(g, w_x, we_y, g->win_h);
 }
 
@@ -740,13 +648,11 @@ void	choose_texture(t_game *g, double ray_angle)
 
 void	check_door_intercept(t_game *g)
 {
-	char	**map;
 	int		x;
 	int		y;
 	int		check_x;
 	int		check_y;
 
-	map = g->vars->p_data.matrix;
 	check_x = g->rcd->tip_p->x;
 	check_y = g->rcd->tip_p->y;
 	if (g->rcd->wall_type == HORIZONTAL
@@ -761,100 +667,55 @@ void	check_door_intercept(t_game *g)
 		return ;
 	else if (y < 0 || y > g->vars->p_data.height)
 		return ;
-	if (map[y][x] == 'D')
+	if (g->vars->p_data.matrix[y][x] == 'D')
 		g->rcd->is_door = 1;
 	else
 		g->rcd->is_door = 0;
 }
 
-/*void	check_door_intercept(t_game *g)
+void	save_middle_ray(t_game *g, double **ray_angles)
 {
-	char	**map;
-	int		x;
-	int		y;
+	init_ray_angles(g, g->ray_angles);
+	*ray_angles = g->ray_angles;
+	get_horizontal_intercept2(g, (*ray_angles)[g->win_w / 2]);
+	get_vertical_intercept2(g, (*ray_angles)[g->win_w / 2]);
+	choose_ray_tip2(g);
+	calc_wall_dist2(g, (*ray_angles)[g->win_w / 2]);
+}
 
-	map = g->vars->p_data.matrix;
-	x = g->rcd->tip_p->x / CUBE_SIZE;
-	y = g->rcd->tip_p->y / CUBE_SIZE;
-	if (x > g->vars->p_data.width || x < 0)
-		return ;
-	else if (y > g->vars->p_data.height || y < 0)
-		return ;
-	if (map[y][x] == 'D')
-	{
-		g->rcd->is_door = 1;
-		//printf("[%d, %d]\n", x, y);
-	}
-	else
-		g->rcd->is_door = 0;
-}*/
+void	cast_rays(t_game *g, double ray_angle, int j)
+{
+	int	wall_height;
+	int	wall_x;
+	int	wall_start_y;
+	int	wall_end_y;
+
+	get_horizontal_intercept(g, ray_angle);
+	get_vertical_intercept(g, ray_angle);
+	choose_ray_tip(g);
+	check_door_intercept(g);
+	choose_texture(g, ray_angle);
+	calc_wall_dist(g, ray_angle);
+	wall_height = (CUBE_SIZE * g->win_h) / g->rcd->tip_dist;
+	wall_x = PX_SIZE;
+	wall_start_y = (g->win_h / 2) - (wall_height / 2);
+	wall_end_y = (g->win_h / 2) + (wall_height / 2);
+	g->rcd->wall_height = wall_height;
+	draw_stripe(g, j, wall_start_y, wall_end_y);
+}
 
 void	render_vision_ray(t_game *g)
 {
-	int		d_x;
-	int		d_y;
-	int		steps;
-	int		i;
 	double	*ray_angles;
+	int		j;
 
-	//ray_angles = malloc(sizeof(double) * g->win_w);
-	/*int	j = 0;
+	save_middle_ray(g, &ray_angles);
+	j = 0;
 	while (j < g->win_w)
 	{
-		printf("ray_angle = [%f]\n", ray_angles[j]);
-		j++;
+		cast_rays(g, ray_angles[j], j);
+		j += PX_SIZE;
 	}
-	exit(0);*/
-	//init_raycast_data(g);
-	//init_raycast_data2(g);
-	init_ray_angles(g, g->ray_angles);
-	ray_angles = g->ray_angles;
-	//g->ray_angles = ray_angles;
-	get_horizontal_intercept2(g, ray_angles[g->win_w / 2]);
-	get_vertical_intercept2(g, ray_angles[g->win_w / 2]);
-	choose_ray_tip2(g);
-	calc_wall_dist2(g, ray_angles[g->win_w / 2]);
-	//printf("mid ray = %f %f\n", g->mrcd->tip_p->x, g->mrcd->tip_p->y);
-	//printf("g player angle = %f\ng rcd angle = %f\n", g->player.angle, g->rcd->angle);
-	//printf("player_dir = [%f]\nmid_ray = [%f]\n", g->rcd->angle, ray_angles[g->win_w / 4]);
-	int	j = 0;
-	while (j < g->win_w)
-	{
-		//printf("j = [%d]\n", j);
-		get_horizontal_intercept(g, ray_angles[j]);
-		get_vertical_intercept(g, ray_angles[j]);
-		choose_ray_tip(g);
-		check_door_intercept(g);
-		choose_texture(g, ray_angles[j]);
-		calc_wall_dist(g, ray_angles[j]);
-		
-		int	wall_height = (CUBE_SIZE * g->win_h) / g->rcd->tip_dist;
-		int	wall_x = PX_SIZE;
-		int	wall_start_y = (g->win_h / 2) - (wall_height / 2);
-		int	wall_end_y = (g->win_h / 2) + (wall_height / 2);
-		g->rcd->wall_height = wall_height;
-		//printf("current ray = [%f]\n", ray_angles[j]);
-		draw_stripe(g, j, wall_start_y, wall_end_y);
-		/*d_x = g->rcd->tip_p->x - g->rcd->p_p->x;
-		d_y = g->rcd->tip_p->y - g->rcd->p_p->y;
-		
-		if (abs(d_x) > abs(d_y))
-			steps = abs(d_x);
-		else
-			steps = abs(d_y);
-		
-		i = 0;
-		while (i <= steps)
-		{
-			render_ray_points(g->rcd->p_p->x + (i * d_x) / steps, 
-							g->rcd->p_p->y + (i * d_y) / steps, g, PLAYER_COLOR);
-			i++;
-		}*/
-		//render_point_debug(g, g->rcd->h_p->x, g->rcd->h_p->y, 0x0000FF);
-		//render_point_debug(g, g->rcd->v_p->x, g->rcd->v_p->y, 0x008000);
-		j += wall_x;
-	}
-	//free(ray_angles);
 }
 
 void	use_door(t_game *g)
