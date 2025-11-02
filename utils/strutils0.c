@@ -6,26 +6,26 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:39:55 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/20 20:54:21 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 21:52:12 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
 
-int     ft_strcmp(const char *s1, const char *s2)
+int	ft_strcmp(const char *s1, const char *s2)
 {
-        int     i;
+	int	i;
 
-        i = 0;
-        if (!s1 || !s2)
-                return (1);
-        while (s1[i] && s2[i])
-        {
-                if (s1[i] - s2[i] != 0)
-                        return (s1[i] - s2[i]);
-                i++;
-        }
-        return (s1[i] - s2[i]);
+	i = 0;
+	if (!s1 || !s2)
+		return (1);
+	while (s1[i] && s2[i])
+	{
+		if (s1[i] - s2[i] != 0)
+			return (s1[i] - s2[i]);
+		i++;
+	}
+	return (s1[i] - s2[i]);
 }
 
 char	*ft_strchr(const char *s, int c)

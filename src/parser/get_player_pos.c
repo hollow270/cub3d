@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:50:59 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/27 10:35:51 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 19:30:27 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,32 +22,26 @@ int	get_player_pos(t_parse_data *p_data)
 	int		x;
 	int		y;
 	int		found;
-	char	**map;
 
-	if (check_map_chars(p_data) == 0)
-		return (0);
-	map = p_data->matrix;
-	y = 0;
+	y = -1;
 	found = 0;
-	while (map[y])
+	while (p_data->matrix[++y])
 	{
-		x = 0;
-		while (map[y][x])
+		x = -1;
+		while (p_data->matrix[y][++x])
 		{
-			if (is_player(map[y][x]) && found == 0)
+			if (is_player(p_data->matrix[y][x]) && found == 0)
 			{
 				p_data->p_x = (float)x + 0.5;
 				p_data->p_y = (float)y + 0.5;
-				p_data->angle = get_player_direction(map[y][x]);
+				p_data->angle = get_player_direction(p_data->matrix[y][x]);
 				found++;
 			}
-			else if (is_player(map[y][x]) && found != 0)
+			else if (is_player(p_data->matrix[y][x]) && found != 0)
 				return (0);
-			x++;
 		}
-		y++;
 	}
-	if (found == 0)
+	if (found == 0 || check_map_chars(p_data) == 0)
 		return (0);
 	return (1);
 }
@@ -77,25 +71,25 @@ int	check_map_chars(t_parse_data *p_data)
 int	is_valid_char(int c)
 {
 	return (c == '1' || c == '0' || c == 'N'
-			|| c == 'E' || c == 'S' || c == 'W'
-			|| c == ' ' || c == 'D');
+		|| c == 'E' || c == 'S' || c == 'W'
+		|| c == ' ' || c == 'D');
 }
 
 int	is_player(int c)
 {
 	return (c == 'N' || c == 'E' || c == 'S'
-			|| c == 'W');
+		|| c == 'W');
 }
 
 double	get_player_direction(int c)
 {
 	if (c == 'N')
-		return ((double)270);// + 180);
+		return ((double)270);
 	if (c == 'E')
-		return ((double)0);// + 180);
+		return ((double)0);
 	if (c == 'S')
-		return ((double)90);// + 180);
+		return ((double)90);
 	if (c == 'W')
-		return ((double)180);// + 180);
+		return ((double)180);
 	return (-1);
 }

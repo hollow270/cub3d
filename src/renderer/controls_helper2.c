@@ -1,27 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory_cleanup.c                                   :+:      :+:    :+:   */
+/*   controls_helper2.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/18 11:03:24 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/01 21:52:46 by yhajbi           ###   ########.fr       */
+/*   Created: 2025/11/02 23:45:43 by yhajbi            #+#    #+#             */
+/*   Updated: 2025/11/03 00:01:48 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/cub3d.h"
+#include "../../inc/cub3d.h"
 
-void	free_map_lines(t_map_line *head)
+int	is_not_passable(int c)
 {
-	t_map_line	*node;
-	t_map_line	*cup;
-
-	node = head;
-	while (node)
-	{
-		cup = node->next;
-		free(node);
-		node = cup;
-	}
+	if (c == '1' || c == 'D')
+		return (1);
+	return (0);
 }

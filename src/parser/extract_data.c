@@ -6,16 +6,16 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 15:10:45 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/21 18:09:20 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 19:35:15 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/cub3d.h"
 
 t_map_line	*extract_assets(t_parse_data *p_data);
-void	extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag);
-void	initialize_rgb(t_parse_data *p_data);
-int	validate_values(char **values);
+void		extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag);
+void		initialize_rgb(t_parse_data *p_data);
+int			validate_values(char **values);
 
 int	extract_data(t_parse_data *p_data)
 {
@@ -74,18 +74,12 @@ void	extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag)
 	if (flag == 1)
 	{
 		while (values[i])
-		{
-			p_data->assets->c_rgb[i] = ft_atoi(values[i]);
-			i++;
-		}
+			p_data->assets->c_rgb[i] = ft_atoi(values[i++]);
 	}
 	else if (flag == 2)
 	{
 		while (values[i])
-		{
-			p_data->assets->f_rgb[i] = ft_atoi(values[i]);
-			i++;
-		}
+			p_data->assets->f_rgb[i] = ft_atoi(values[i++]);
 	}
 	return ;
 }
@@ -113,7 +107,7 @@ int	validate_values(char **values)
 		{
 			if (values[i][j] < '0' || values[i][j] > '9')
 				return (0);
-				j++;
+			j++;
 		}
 		i++;
 	}

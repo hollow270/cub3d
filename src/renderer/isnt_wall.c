@@ -1,27 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory_cleanup.c                                   :+:      :+:    :+:   */
+/*   isnt_wall.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/18 11:03:24 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/01 21:52:46 by yhajbi           ###   ########.fr       */
+/*   Created: 2025/11/02 23:59:55 by yhajbi            #+#    #+#             */
+/*   Updated: 2025/11/03 00:00:46 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/cub3d.h"
+#include "../../inc/cub3d.h"
 
-void	free_map_lines(t_map_line *head)
+int	isnt_wall(int c)
 {
-	t_map_line	*node;
-	t_map_line	*cup;
-
-	node = head;
-	while (node)
-	{
-		cup = node->next;
-		free(node);
-		node = cup;
-	}
+	return (c == '0' || c == 'N' || c == 'E' || c == 'S' || c == 'W');
 }

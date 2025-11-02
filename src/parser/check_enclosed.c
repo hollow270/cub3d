@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 12:42:13 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/21 15:38:44 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 17:42:54 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int	check_enclosed_helper(char	**map, int x, int y, int in_spc)
 		return (0);
 	else if (is_inner_char(map[y][x]) && y == 0)
 		return (0);
-	else if (is_inner_char(map[y][x]) && y == count_height(map) - 1) 
+	else if (is_inner_char(map[y][x]) && y == count_height(map) - 1)
 		return (0);
 	else if (is_inner_char(map[y][x]) && in_spc == 1)
 		return (0);
@@ -77,7 +77,7 @@ int	count_height(char **map)
 int	is_inner_char(int c)
 {
 	return (c == '0' || c == 'N' || c == 'E' || c == 'S'
-			|| c == 'W' || c == 'D');
+		|| c == 'W' || c == 'D');
 }
 
 int	count_width(char **map, int y)
