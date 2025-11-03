@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 13:12:36 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/30 13:12:38 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:15:43 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	fill_map_space(t_parse_data *p_data)
 	map = p_data->matrix;
 	while (map[y])
 	{
-		if (ft_strlen(map[y]) < max_x)
+		if ((int)(ft_strlen(map[y])) < max_x)
 			add_walls(&map[y], max_x);
 		x = 0;
 		while (map[y][x])
@@ -40,7 +40,6 @@ void	fill_map_space(t_parse_data *p_data)
 		y++;
 	}
 	get_map_dimensions(p_data);
-	printf("map dimensions = [%d, %d]\n", p_data->width, p_data->height);
 }
 
 int	get_max_width(t_parse_data *p_data)

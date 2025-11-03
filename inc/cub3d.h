@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 00:07:45 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:09:33 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,8 +271,8 @@ void		choose_ray_tip2(t_game *g);
 void		calc_wall_dist2(t_game *g, double ray_angle);
 void		my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void		calc_wall_dist(t_game *g, double ray_angle);
-void		ghi_helper(t_game *g, t_raycast *rcd, double angle, double *y_step);
-void		gvi_helper(t_game *g, t_raycast *rcd, double angle, double *x_step);
+void		ghi_helper(t_raycast *rcd, double angle, double *y_step);
+void		gvi_helper(t_raycast *rcd, double angle, double *x_step);
 int			is_wall(t_game *g, double x, double y, int flag);
 double		calc_dist(t_pos *p1, t_pos *p2);
 void		set_tip(t_pos *dst, t_pos *src,

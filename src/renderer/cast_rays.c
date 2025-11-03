@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 22:21:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/02 23:57:16 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:10:17 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	cast_rays(t_game *g, double ray_angle, int j)
 {
 	int	wall_height;
-	int	wall_x;
 	int	wall_start_y;
 	int	wall_end_y;
 
@@ -26,7 +25,6 @@ void	cast_rays(t_game *g, double ray_angle, int j)
 	choose_texture(g, ray_angle);
 	calc_wall_dist(g, ray_angle);
 	wall_height = (CUBE_SIZE * g->win_h) / g->rcd->tip_dist;
-	wall_x = PX_SIZE;
 	wall_start_y = (g->win_h / 2) - (wall_height / 2);
 	wall_end_y = (g->win_h / 2) + (wall_height / 2);
 	g->rcd->wall_height = wall_height;
@@ -41,7 +39,7 @@ void	get_horizontal_intercept(t_game *g, t_raycast *rcd,
 	double	check_y;
 	int		max_i;
 
-	ghi_helper(g, rcd, angle, &y_step);
+	ghi_helper(rcd, angle, &y_step);
 	rcd->h_p->x = rcd->p_p->x + ((rcd->h_p->y - rcd->p_p->y) / tan(angle));
 	x_step = y_step / tan(angle);
 	max_i = 100;
@@ -66,7 +64,7 @@ void	get_vertical_intercept(t_game *g, t_raycast *rcd,
 	double	check_x;
 	int		max_i;
 
-	gvi_helper(g, rcd, angle, &x_step);
+	gvi_helper(rcd, angle, &x_step);
 	rcd->v_p->y = rcd->p_p->y + ((rcd->v_p->x - rcd->p_p->x) * tan(angle));
 	y_step = x_step * tan(angle);
 	max_i = 100;

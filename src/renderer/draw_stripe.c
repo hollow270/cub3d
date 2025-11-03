@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 15:26:11 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/02 23:57:57 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:07:28 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,6 @@
 
 void	draw_stripe(t_game *g, int w_x, int ws_y, int we_y)
 {
-	int	x;
-	int	y;
-
-	x = w_x;
-	y = ws_y;
 	draw_ceiling(g, w_x, 0, ws_y);
 	draw_wall(g, w_x, ws_y, we_y);
 	draw_ground(g, w_x, we_y, g->win_h);

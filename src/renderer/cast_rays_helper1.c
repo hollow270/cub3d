@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 23:54:14 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/02 23:57:42 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:06:58 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	calc_wall_dist(t_game *g, double ray_angle)
 	g->rcd->tip_dist = actual_dist * cos(ray_angle - g->rcd->angle);
 }
 
-void	ghi_helper(t_game *g, t_raycast *rcd, double angle, double *y_step)
+void	ghi_helper(t_raycast *rcd, double angle, double *y_step)
 {
 	if (fabs(sin(angle)) < 0.0001)
 	{
@@ -47,7 +47,7 @@ void	ghi_helper(t_game *g, t_raycast *rcd, double angle, double *y_step)
 	}
 }
 
-void	gvi_helper(t_game *g, t_raycast *rcd, double angle, double *x_step)
+void	gvi_helper(t_raycast *rcd, double angle, double *x_step)
 {
 	if (fabs(cos(angle)) < 0.0001)
 	{

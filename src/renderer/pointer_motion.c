@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 22:07:36 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 00:02:00 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:08:52 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	pointer_motion(int x, int y, t_game *g)
 	int			center_y;
 	int			diff;
 
+	(void)y;
 	center_x = g->win_w / 2;
 	center_y = g->win_h / 2;
 	if (g->mouse_control == 0)

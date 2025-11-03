@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 15:10:45 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/01 19:35:15 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:05:22 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,16 +70,16 @@ void	extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag)
 		return ;
 	if (validate_values(values) == 0)
 		return ;
-	i = 0;
+	i = -1;
 	if (flag == 1)
 	{
-		while (values[i])
-			p_data->assets->c_rgb[i] = ft_atoi(values[i++]);
+		while (values[++i])
+			p_data->assets->c_rgb[i] = ft_atoi(values[i]);
 	}
 	else if (flag == 2)
 	{
-		while (values[i])
-			p_data->assets->f_rgb[i] = ft_atoi(values[i++]);
+		while (values[++i])
+			p_data->assets->f_rgb[i] = ft_atoi(values[i]);
 	}
 	return ;
 }

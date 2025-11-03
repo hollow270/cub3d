@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 23:40:09 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 00:01:40 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:08:26 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	use_door(t_game *g)
 {
 	int			map_x;
 	int			map_y;
-	char		**map;
 
 	map_x = g->mrcd->tip_p->x;
 	map_y = g->mrcd->tip_p->y;

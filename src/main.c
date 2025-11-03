@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/02 23:49:01 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:12:20 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ int	main(int argc, char *argv[])
 		return (printf("Error\nInvalid file extension\n"), 2);
 	if (parse_map_file(argv[1], &vars.p_data) == 0 || vars.p_data.is_valid == 0)
 		return (gc_free_all(), 3);
-	printf("p_x = [%f]\np_y = [%f]\n", vars.p_data.p_x, vars.p_data.p_y);
 	cube_init(&vars);
 	gc_free_all();
 	return (0);
