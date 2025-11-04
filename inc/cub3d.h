@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 18:09:33 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/04 15:28:55 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,5 +303,7 @@ void		use_door(t_game *g);
 void		set_door_status(t_game *g, char **map, int x, int y);
 int			is_not_passable(int c);
 int			isnt_wall(int c);
+void		strafe_left(t_game *g, double angle, int dir);
+void		strafe_right(t_game *g, double angle, int dir);
 
 #endif

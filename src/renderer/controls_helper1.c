@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 22:01:59 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 18:31:35 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/04 15:30:23 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,18 @@ void	controls_helper2(int keycode, t_game *g)
 	angle = g->player.angle * PI / 180;
 	if (keycode == 'w')
 		move_forward(g, angle);
-	else if (keycode == 'd' && check_new_position(g->player.pos_x
-			+ MOVE_SPEED, g->player.pos_y, g, 'd'))
-		g->player.pos_x += MOVE_SPEED;
+	else if (keycode == 'd')
+		strafe_right(g, angle, 'd');
+	/* else if (keycode == 'd' && check_new_position(g->player.pos_x */
+	/* 		+ MOVE_SPEED, g->player.pos_y, g, 'd')) */
+		/* g->player.pos_x += MOVE_SPEED; */
 	else if (keycode == 's')
 		move_backward(g, angle);
-	else if (keycode == 'a' && check_new_position(g->player.pos_x
-			- MOVE_SPEED, g->player.pos_y, g, 'a'))
-		g->player.pos_x -= MOVE_SPEED;
+	else if (keycode == 'a')
+		strafe_left(g, angle, 'a');
+	/* else if (keycode == 'a' && check_new_position(g->player.pos_x */
+	/* 		- MOVE_SPEED, g->player.pos_y, g, 'a')) */
+		/* g->player.pos_x -= MOVE_SPEED; */
 }
 
 void	move_forward(t_game *g, double angle)
