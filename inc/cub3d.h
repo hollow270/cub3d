@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/04 15:28:55 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/04 20:29:53 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,6 +247,7 @@ char		*ft_strstr(char *s1, char *s2);
 void		free_map_lines(t_map_line *head);
 void		*gc_malloc(size_t size);
 void		gc_free_all(void);
+int			check_duplicates(t_parse_data p_data);
 
 // RENDERER
 

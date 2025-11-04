@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 18:12:20 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/04 20:01:37 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include <X11/X.h>
 
 int		check_extension(char *file_name);
-int		close_game(t_game *g);
-void	use_door(t_game *g);
 
 int	main(int argc, char *argv[])
 {
@@ -27,6 +25,8 @@ int	main(int argc, char *argv[])
 		return (printf("Error\nInvalid file extension\n"), 2);
 	if (parse_map_file(argv[1], &vars.p_data) == 0 || vars.p_data.is_valid == 0)
 		return (gc_free_all(), 3);
+	if (check_duplicates(vars.p_data) == 0)
+		return (gc_free_all(), printf("Error\nDuplicate asset lines in map file\n"), 3);
 	cube_init(&vars);
 	gc_free_all();
 	return (0);

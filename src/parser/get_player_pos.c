@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:50:59 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/01 19:30:27 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/04 19:51:12 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,21 +50,27 @@ int	check_map_chars(t_parse_data *p_data)
 {
 	int		x;
 	int		y;
+	int		doors;
 	char	**map;
 
-	y = 0;
+	y = -1;
 	map = p_data->matrix;
-	while (map[y])
+	doors = 0;
+	while (map[++y])
 	{
-		x = 0;
-		while (map[y][x])
+		x = -1;
+		while (map[y][++x])
 		{
 			if (is_valid_char(map[y][x]) == 0)
 				return (printf("culprit = %c\n", map[y][x]), 0);
-			x++;
+			if (map[y][x] == 'D')
+				doors++;
 		}
-		y++;
 	}
+	if (doors > 0 && !p_data->has_door)
+		return (0);
+	else if (doors == 0 && p_data->has_door)
+		return (0);
 	return (1);
 }
 
