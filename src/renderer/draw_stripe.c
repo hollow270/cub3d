@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 15:26:11 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 18:07:28 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/06 10:58:58 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	draw_ceiling(t_game *g, int c_x, int cs_y, int ce_y)
 				x++;
 				continue ;
 			}
-			my_mlx_pixel_put(&g->img, x, y, SKY);
+			my_mlx_pixel_put(&g->img, x, y, g->c_rgb);
 			x++;
 		}
 		y++;
@@ -71,7 +71,7 @@ void	draw_ground(t_game *g, int g_x, int gs_y, int ge_y)
 		x = g_x;
 		while (x < g_x + PX_SIZE)
 		{
-			my_mlx_pixel_put(&g->img, x, y, GROUND);
+			my_mlx_pixel_put(&g->img, x, y, g->f_rgb);
 			x++;
 		}
 		y++;

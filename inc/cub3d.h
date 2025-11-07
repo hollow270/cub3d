@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/04 20:29:53 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/07 16:31:53 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <X11/X.h>
 # include <stdbool.h>
 # include "get_next_line.h"
-# include "../src/.mlx/mlx.h"
+# include "../.mlx/mlx.h"
 
 # define NO_WALL "./assets/north_wall.xpm"
 # define EA_WALL "./assets/east_wall.xpm"
@@ -42,7 +42,7 @@
 # define BLACK			0x000000
 # define BROWN			0x964B00
 # define PLAYER_COLOR	0xFF0000
-# define PX_SIZE			5
+# define PX_SIZE			3
 # define DOOR_OPEN_DIST	140
 # define WIN_W			1000
 # define WIN_H			1000
@@ -104,6 +104,8 @@ typedef struct s_assets
 	char	*door;
 	int		f_rgb[3];
 	int		c_rgb[3];
+	int		f_color;
+	int		c_color;
 }			t_assets;
 
 typedef struct s_map_line
@@ -211,6 +213,8 @@ typedef struct s_game
 	int			*chosen_tx;
 	double		*ray_angles;
 	bool		mouse_control;
+	int			f_rgb;
+	int			c_rgb;
 }	t_game;
 
 // PARSER

@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 15:10:45 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 18:05:22 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/07 15:17:09 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ int	extract_data(t_parse_data *p_data)
 	line = extract_assets(p_data);
 	if (!line)
 		return (0);
+	p_data->assets->f_color = (p_data->assets->f_rgb[0] << 16)
+		| (p_data->assets->f_rgb[1] << 8) | p_data->assets->f_rgb[2];
+	p_data->assets->c_color = (p_data->assets->c_rgb[0] << 16)
+		| (p_data->assets->c_rgb[1] << 8) | p_data->assets->c_rgb[2];
 	return (1);
 }
 
@@ -66,10 +70,13 @@ void	extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag)
 	int		i;
 
 	values = ft_split(cur_line->line + 2, ',');
-	if (ft_splitlen(values) > 3)
+	if (ft_splitlen(values) != 3)
 		return ;
 	if (validate_values(values) == 0)
+	{
+		p_data->is_valid = 0;
 		return ;
+	}
 	i = -1;
 	if (flag == 1)
 	{
@@ -102,6 +109,8 @@ int	validate_values(char **values)
 	i = 0;
 	while (values[i])
 	{
+		if (ft_atoi(values[i]) > 255 || ft_atoi(values[i]) < 0)
+			return (printf("Error\nInvalid color values\n"), 0);
 		j = 0;
 		while (values[i][j])
 		{

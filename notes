@@ -1,4 +1,6 @@
 fix minimap
 DONE fix .cub file that has dubplicate color lines being valid and running
 DONE fix .cub file having a 'D' character but not including the door texture path
-fix colors in .cub file not being used at all
+DONE fix colors in .cub file not being used at all
+DONE add bonus rule in the makfile
+remove "-g" from the CC flags in the makefile

@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 21:56:14 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 00:01:32 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/06 10:58:24 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ void	init_game_data(t_game *g, t_vars *vars)
 	g->player.bob_amplitude = 16;
 	g->player.bob_frequency = 5;
 	g->player.angle = g->vars->p_data.angle;
+	g->f_rgb = vars->p_data.assets->f_color;
+	g->c_rgb = vars->p_data.assets->c_color;
 }
 
 void	init_sprites(t_game *g)
