@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 22:04:13 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/02 23:49:58 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/07 23:44:12 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,16 @@ void	init_raycast_data2(t_game *g)
 
 int	render(t_game *g)
 {
-	render_map_background(g);
-	render_map(g);
-	render_player(g);
+	/* render_map_background(g); */
+	//render_map(g);
+	//render_player(g);
 	init_raycast_data(g);
 	init_raycast_data2(g);
 	g->ray_angles = gc_malloc(sizeof(double) * g->win_w);
 	render_vision_ray(g);
 	render_hell_yeah_pov(g);
+	render_minimap(g);
 	mlx_put_image_to_window(g->vars->mlx, g->vars->win, g->img.img, 0, 0);
+	/* printf("%f %f\n", g->player.pos_x, g->player.pos_y); */
 	return (0);
 }

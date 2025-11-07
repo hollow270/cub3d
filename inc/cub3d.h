@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/07 16:31:53 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/07 23:04:10 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,31 @@ typedef struct s_game
 	int			c_rgb;
 }	t_game;
 
+typedef struct s_mp
+{
+	t_game	*g;
+	char	**map;
+	int		gx;
+	int		gy;
+	int		width_in_gcells;
+	int		minb_x;
+	int		minb_y;
+	int		maxb_x;
+	int		maxb_y;
+	int		p_x;
+	int		p_y;
+	double	p_fx;
+	double	p_fy;
+	int		ming_x;
+	int		ming_y;
+	int		maxg_x;
+	int		maxg_y;
+	int		sc_x;
+	int		sc_y;
+	int		cube_x;
+	int		cube_y;
+}			t_mp;
+
 // PARSER
 
 void		ifc_helper1(t_parse_data *p_data,
@@ -310,5 +335,6 @@ int			is_not_passable(int c);
 int			isnt_wall(int c);
 void		strafe_left(t_game *g, double angle, int dir);
 void		strafe_right(t_game *g, double angle, int dir);
+void		render_minimap(t_game *g);
 
 #endif

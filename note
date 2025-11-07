@@ -1,0 +1,9 @@
+> set a max and min x_border
+> set a max and min y_border
+> set the player position to always be in the center of the borders
+> calculate max and min x in grid map coords in function with the player's grid map coords
+> calculate max and min y in grid map coords in function with the player's grid map coords
+> draw the map starting from the min x and y grid map coords
+by drawing squares for each cell with a different color depending on wether it's a wall of a ground cell
+> the function used to draw the squares needs to have a check to see to be able to
+draw only inside the max and min xy_borders
