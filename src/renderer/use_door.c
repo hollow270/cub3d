@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 23:40:09 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/03 18:08:26 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 19:01:35 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void	set_door_status(t_game *g, char **map, int x, int y)
 {
 	if (map[y][x] == 'D' && g->mrcd->tip_dist < DOOR_OPEN_DIST)
 		map[y][x] = 'O';
-	else if (map[y][x] == 'O' && g->mrcd->tip_dist < DOOR_OPEN_DIST)
+	else if (map[y][x] == 'O' && g->mrcd->tip_dist < DOOR_OPEN_DIST
+		&& g->mrcd->tip_dist > DOOR_MIN_ODIST)
 		map[y][x] = 'D';
 }

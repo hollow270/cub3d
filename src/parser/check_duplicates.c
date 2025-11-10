@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 20:02:15 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/04 20:45:43 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 16:06:26 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	has_only(char *s, int c);
 
-int check_duplicates(t_parse_data p_data)
+int	check_duplicates(t_parse_data p_data)
 {
 	char	**content;
 	int		i;
@@ -27,21 +27,14 @@ int check_duplicates(t_parse_data p_data)
 	{
 		j = 0;
 		count = 0;
-		/* printf("started\n"); */
 		if (has_only(content[i], '1'))
 			return (1);
-		/* printf("%s\n", content[i]); */
 		while (content[j])
 		{
-			/* printf("%s\n", content[j]); */
 			if (ft_strcmp(content[i], content[j]) == 0 && count == 0)
 				count++;
 			else if (ft_strcmp(content[i], content[j]) == 0 && count > 0)
-			{
-				printf("%s | %s\n", content[i], content[j]);
 				return (0);
-			}
-			/* printf("reached\n"); */
 			j++;
 		}
 		i++;
@@ -62,4 +55,3 @@ int	has_only(char *s, int c)
 	}
 	return (1);
 }
-

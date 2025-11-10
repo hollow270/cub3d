@@ -1,4 +1,4 @@
-CC = gcc -g -Wall -Wextra -Werror
+CC = gcc -Wall -Wextra -Werror
 MLXFALGS = -lXext -lX11 -lm
 
 ARC = .mlx/libmlx_Linux.a

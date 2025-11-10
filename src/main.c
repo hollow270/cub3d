@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/04 20:01:37 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 16:30:26 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ int	main(int argc, char *argv[])
 	if (parse_map_file(argv[1], &vars.p_data) == 0 || vars.p_data.is_valid == 0)
 		return (gc_free_all(), 3);
 	if (check_duplicates(vars.p_data) == 0)
-		return (gc_free_all(), printf("Error\nDuplicate asset lines in map file\n"), 3);
+		return (gc_free_all(),
+			printf("Error\nDuplicate asset lines in map file\n"), 3);
 	cube_init(&vars);
 	gc_free_all();
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 22:17:21 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/02 23:56:55 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 22:06:42 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	render_hell_yeah_pov(t_game *g)
 
 	bob_offset = g->player.bob_amplitude
 		* sin(g->player.bob_frequency * g->player.bob_time);
-	offset_y = (int)bob_offset;
+	offset_y = (int)bob_offset + 30;
 	image_y = 0;
 	while (image_y < 1000)
 	{

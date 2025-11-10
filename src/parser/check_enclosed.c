@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 12:42:13 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/01 17:42:54 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 16:07:27 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@ int	check_enclosed(t_parse_data *p_data)
 		{
 			if (check_enclosed_helper(map, x, y, in_spc) == 0)
 				return (0);
+			else if (map[y][x] == '0')
+			{
+				if (check_outofbounds_floor(map, x, y) == 0)
+					return (printf("%c at [%d, %d]\n", map[y][x], x, y), 0);
+			}
 			x++;
 		}
 		y++;

@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/07 23:04:10 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 21:57:49 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,25 +27,53 @@
 # define EA_WALL "./assets/east_wall.xpm"
 # define SO_WALL "./assets/south_wall.xpm"
 # define WE_WALL "./assets/west_wall.xpm"
+# define HELL_YEAH "./assets/budweiser.xpm"
 
 # define PI 				3.14159
 # define FOV				60
-# define CUBE_SIZE		64
-# define MINIMAP_SIZE	10
-# define RAY_WIDTH		3
+# define CUBE_SIZE			64
+# define MINIMAP_SIZE		10
+# define RAY_WIDTH			3
 # define PLAYER_SIZE		10
-# define ROT_SPEED		10
-# define MOVE_SPEED		0.1
-# define WHITE			0xFFFFFF
-# define GROUND			0x2b2b2a
+# define ROT_SPEED			10
+# define MOVE_SPEED			0.1
+# define WHITE				0xFFFFFF
+# define GROUND				0x2b2b2a
 # define SKY				0x87CEEB
-# define BLACK			0x000000
-# define BROWN			0x964B00
-# define PLAYER_COLOR	0xFF0000
+# define BLACK				0x000000
+# define BROWN				0x964B00
+# define PLAYER_COLOR		0xFF0000
+# define COLLIDER_SZ		0.3
 # define PX_SIZE			3
-# define DOOR_OPEN_DIST	140
-# define WIN_W			1000
-# define WIN_H			1000
+# define DOOR_OPEN_DIST		140
+# define DOOR_MIN_ODIST		35
+# define WIN_W				1000
+# define WIN_H				1000
+
+typedef struct s_collider
+{
+	double	start_x;
+	double	start_y;
+	double	max_x;
+	double	max_y;
+	double	x;
+	double	y;
+}			t_collider;
+
+typedef struct s_fog
+{
+	double	max_fog_distance;
+	double	fog_intensity;
+	int		r;
+	int		g;
+	int		b;
+	int		fog_r;
+	int		fog_g;
+	int		fog_b;
+	int		final_r;
+	int		final_g;
+	int		final_b;
+}			t_fog;
 
 typedef struct s_minimap
 {
@@ -277,6 +305,7 @@ void		free_map_lines(t_map_line *head);
 void		*gc_malloc(size_t size);
 void		gc_free_all(void);
 int			check_duplicates(t_parse_data p_data);
+int			check_outofbounds_floor(char **map, int x, int y);
 
 // RENDERER
 
@@ -328,13 +357,16 @@ int			close_game(t_game *g);
 int			pointer_motion(int x, int y, t_game *g);
 void		move_forward(t_game *g, double angle);
 void		move_backward(t_game *g, double angle);
-int			check_new_position(double new_x, double new_y, t_game *g, int dir);
+int			check_new_position(double new_x, double new_y, t_game *g/* , int dir */);
 void		use_door(t_game *g);
 void		set_door_status(t_game *g, char **map, int x, int y);
 int			is_not_passable(int c);
 int			isnt_wall(int c);
-void		strafe_left(t_game *g, double angle, int dir);
-void		strafe_right(t_game *g, double angle, int dir);
+void		strafe_left(t_game *g, double angle);
+void		strafe_right(t_game *g, double angle);
 void		render_minimap(t_game *g);
+int			apply_fog_effect(int original_color, double distance);
+void		draw_pixel(t_mp *mp);
+int			is_within_limits(t_mp *mp, int x, int y);
 
 #endif

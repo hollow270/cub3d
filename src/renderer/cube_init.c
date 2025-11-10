@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 21:56:14 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/06 10:58:24 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 21:57:57 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	init_sprites(t_game *g)
 		g->d_img = mlx_xpm_file_to_image(g->vars->mlx,
 				g->vars->p_data.assets->door, &width, &height);
 	g->h_img = mlx_xpm_file_to_image(g->vars->mlx,
-			"./assets/hell_yeah_pov.xpm", &h_width, &h_height);
+			HELL_YEAH, &h_width, &h_height);
 	init_data_addresses(g);
 }
 

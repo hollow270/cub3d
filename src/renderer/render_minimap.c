@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 18:50:12 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/07 23:58:18 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 16:29:47 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,7 @@
 
 void	init_mp_data(t_game *g, t_mp *mp);
 void	draw_minimap(t_mp *mp);
-int		is_within_limits(t_mp *mp, int x, int y);
 void	draw_square(t_mp *mp, int gx, int gy);
-void	draw_pixel(t_mp *mp);
 void	draw_player(t_mp *mp);
 
 void	render_minimap(t_game *g)
@@ -81,7 +79,8 @@ void	draw_player(t_mp *mp)
 		cube_x = 0;
 		while (cube_x < MINIMAP_SIZE)
 		{
-			my_mlx_pixel_put(&mp->g->img, cube_x + start_x, cube_y + start_y, PLAYER_COLOR);
+			my_mlx_pixel_put(&mp->g->img, cube_x
+				+ start_x, cube_y + start_y, PLAYER_COLOR);
 			cube_x++;
 		}
 		cube_y++;
@@ -110,30 +109,4 @@ void	draw_square(t_mp *mp, int gx, int gy)
 		}
 		mp->cube_y++;
 	}
-}
-
-void	draw_pixel(t_mp *mp)
-{
-	int	pixel_x;
-	int	pixel_y;
-
-	pixel_x = mp->sc_x + mp->cube_x;
-	pixel_y = mp->sc_y + mp->cube_y;
-	if (mp->map[mp->gy][mp->gx] == 'D')
-		my_mlx_pixel_put(&mp->g->img, pixel_x, pixel_y, BROWN);
-	else if (mp->map[mp->gy][mp->gx] == '1')
-		my_mlx_pixel_put(&mp->g->img, pixel_x, pixel_y, WHITE);
-	else
-		my_mlx_pixel_put(&mp->g->img, pixel_x, pixel_y, GROUND);
-}
-
-int		is_within_limits(t_mp *mp, int x, int y)
-{
-	if (y < 0 || y >= mp->g->vars->p_data.height || x < 0 || x > mp->g->vars->p_data.width)
-		return (0);
-	else if (x < mp->ming_x || x > mp->maxg_x)
-		return (0);
-	else if (y < mp->ming_y || y > mp->maxg_y)
-		return (0);
-	return (1);
 }

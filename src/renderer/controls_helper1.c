@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 22:01:59 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/04 15:30:23 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/10 19:28:15 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,11 @@ void	controls_helper2(int keycode, t_game *g)
 	if (keycode == 'w')
 		move_forward(g, angle);
 	else if (keycode == 'd')
-		strafe_right(g, angle, 'd');
-	/* else if (keycode == 'd' && check_new_position(g->player.pos_x */
-	/* 		+ MOVE_SPEED, g->player.pos_y, g, 'd')) */
-		/* g->player.pos_x += MOVE_SPEED; */
+		strafe_right(g, angle);
 	else if (keycode == 's')
 		move_backward(g, angle);
 	else if (keycode == 'a')
-		strafe_left(g, angle, 'a');
-	/* else if (keycode == 'a' && check_new_position(g->player.pos_x */
-	/* 		- MOVE_SPEED, g->player.pos_y, g, 'a')) */
-		/* g->player.pos_x -= MOVE_SPEED; */
+		strafe_left(g, angle);
 }
 
 void	move_forward(t_game *g, double angle)
@@ -65,11 +59,15 @@ void	move_forward(t_game *g, double angle)
 
 	new_x = g->player.pos_x + cos(angle) * MOVE_SPEED;
 	new_y = g->player.pos_y + sin(angle) * MOVE_SPEED;
-	if (check_new_position(new_x, new_y, g, 'w'))
+	if (check_new_position(new_x, new_y, g))
 	{
 		g->player.pos_x = new_x;
 		g->player.pos_y = new_y;
 	}
+	else if (check_new_position(new_x, g->player.pos_y, g))
+		g->player.pos_x = new_x;
+	else if (check_new_position(g->player.pos_x, new_y, g))
+		g->player.pos_y = new_y;
 }
 
 void	move_backward(t_game *g, double angle)
@@ -79,34 +77,38 @@ void	move_backward(t_game *g, double angle)
 
 	new_x = g->player.pos_x + cos(angle) * (-MOVE_SPEED);
 	new_y = g->player.pos_y + sin(angle) * (-MOVE_SPEED);
-	if (check_new_position(new_x, new_y, g, 's'))
+	if (check_new_position(new_x, new_y, g))
 	{
 		g->player.pos_x = new_x;
 		g->player.pos_y = new_y;
 	}
+	else if (check_new_position(new_x, g->player.pos_y, g))
+		g->player.pos_x = new_x;
+	else if (check_new_position(g->player.pos_x, new_y, g))
+		g->player.pos_y = new_y;
 }
 
-int	check_new_position(double new_x, double new_y, t_game *g, int dir)
+int	check_new_position(double new_x, double new_y, t_game *g)
 {
-	double	player_size_in_map;
+	t_collider	col;
+	char		**map;
 
-	player_size_in_map = (double)PLAYER_SIZE / CUBE_SIZE;
-	if (dir == 'a' || dir == 'w')
+	col.start_x = new_x - COLLIDER_SZ;
+	col.start_y = new_y - COLLIDER_SZ;
+	col.max_x = new_x + COLLIDER_SZ;
+	col.max_y = new_y + COLLIDER_SZ;
+	col.y = col.start_y;
+	map = g->vars->p_data.matrix;
+	while (col.y < col.max_y)
 	{
-		if (is_not_passable(g->vars->p_data.matrix[(int)(new_y)][(int)(new_x)]))
-			return (0);
-	}
-	else if (dir == 'd')
-	{
-		if (is_not_passable(g->vars->p_data.matrix[(int)(new_y)]
-			[(int)(new_x + player_size_in_map)]))
-			return (0);
-	}
-	else if (dir == 's')
-	{
-		if (is_not_passable(g->vars->p_data.matrix
-				[(int)(new_y + player_size_in_map)][(int)(new_x)]))
-			return (0);
+		col.x = col.start_x;
+		while (col.x < col.max_x)
+		{
+			if (is_not_passable(map[(int)(col.y)][(int)(col.x)]))
+				return (0);
+			col.x += 0.05;
+		}
+		col.y += 0.05;
 	}
 	return (1);
 }
