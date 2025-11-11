@@ -1,9 +1,199 @@
-> set a max and min x_border
-> set a max and min y_border
-> set the player position to always be in the center of the borders
-> calculate max and min x in grid map coords in function with the player's grid map coords
-> calculate max and min y in grid map coords in function with the player's grid map coords
-> draw the map starting from the min x and y grid map coords
-by drawing squares for each cell with a different color depending on wether it's a wall of a ground cell
-> the function used to draw the squares needs to have a check to see to be able to
-draw only inside the max and min xy_borders
+Yes — I remember your cub3d project (the Doom/Wolfenstein-style raycaster you’ve been building, complete with the Budweiser “Hell Yeah” POV sprite).
+
+You’re absolutely right: using mlx_hook() with a single KeyPress event makes it impossible to detect multiple keys held simultaneously.
+The fix — tracking key state instead of key events — is exactly the right approach for smooth, combined movement (e.g., moving forward while strafing).
+
+Let’s integrate that properly into your existing codebase without breaking any of your current logic.
+
+✅ Step-by-Step Integration
+1. Extend your t_game struct
+
+In cub3d.h, add this new sub-struct near the bottom (just before the t_game definition or after it):
+
+typedef struct s_keys
+{
+	bool w;
+	bool a;
+	bool s;
+	bool d;
+	bool left_arrow;
+	bool right_arrow;
+}	t_keys;
+
+
+Then update your t_game struct:
+
+typedef struct s_game
+{
+	t_vars		*vars;
+	t_raycast	*rcd;
+	t_raycast	*mrcd;
+	t_player	player;
+	t_img		img;
+	int			win_w;
+	int			win_h;
+	int			minimap_w;
+	int			minimap_h;
+	void		*n_img;
+	void		*e_img;
+	void		*s_img;
+	void		*w_img;
+	void		*d_img;
+	void		*h_img;
+	int			*n_data;
+	int			*e_data;
+	int			*s_data;
+	int			*w_data;
+	int			*d_data;
+	int			*h_data;
+	int			*chosen_tx;
+	double		*ray_angles;
+	bool		mouse_control;
+	int			f_rgb;
+	int			c_rgb;
+	t_keys		keys;     // 👈 Add this line
+}	t_game;
+
+2. Add new key event handlers
+
+Create two new functions in your controls file (e.g. controls.c):
+
+int	key_press(int keycode, t_game *g)
+{
+	if (keycode == 'w')
+		g->keys.w = true;
+	else if (keycode == 'a')
+		g->keys.a = true;
+	else if (keycode == 's')
+		g->keys.s = true;
+	else if (keycode == 'd')
+		g->keys.d = true;
+	else if (keycode == 65361 || keycode == 123)
+		g->keys.left_arrow = true;
+	else if (keycode == 65363 || keycode == 124)
+		g->keys.right_arrow = true;
+	else if (keycode == 65307)
+		return (close_game(g), 0);
+	else if (keycode == 101)
+		use_door(g);
+	else if (keycode == 109)
+	{
+		if (!g->mouse_control)
+		{
+			mlx_mouse_hide(g->vars->mlx, g->vars->win);
+			g->mouse_control = true;
+		}
+		else
+		{
+			mlx_mouse_show(g->vars->mlx, g->vars->win);
+			g->mouse_control = false;
+		}
+	}
+	return (0);
+}
+
+int	key_release(int keycode, t_game *g)
+{
+	if (keycode == 'w')
+		g->keys.w = false;
+	else if (keycode == 'a')
+		g->keys.a = false;
+	else if (keycode == 's')
+		g->keys.s = false;
+	else if (keycode == 'd')
+		g->keys.d = false;
+	else if (keycode == 65361 || keycode == 123)
+		g->keys.left_arrow = false;
+	else if (keycode == 65363 || keycode == 124)
+		g->keys.right_arrow = false;
+	return (0);
+}
+
+
+These replace the need for your old controls() function.
+You can safely remove controls(), controls_helper1(), and controls_helper2() if you wish — their behavior is now split between these two new handlers and the render loop.
+
+3. Update your cube_init() setup
+
+Replace the old key hook:
+
+mlx_hook(vars->win, KeyPress, KeyPressMask, controls, g);
+
+
+with two event hooks:
+
+mlx_hook(vars->win, 2, 1L<<0, key_press, g);    // KeyPress
+mlx_hook(vars->win, 3, 1L<<1, key_release, g);  // KeyRelease
+
+
+The rest of your setup stays the same:
+
+mlx_loop_hook(g->vars->mlx, render, g);
+mlx_hook(vars->win, DestroyNotify, NoEventMask, close_game, g);
+mlx_hook(vars->win, MotionNotify, PointerMotionMask, pointer_motion, g);
+
+
+And don’t forget to initialize your key states to false when starting:
+
+memset(&g->keys, 0, sizeof(t_keys));
+
+
+You can put that right after init_sprites(g); inside cube_init().
+
+4. Handle movement each frame in render()
+
+Now that you track key states, your player’s movement should happen every frame inside render():
+
+Example (simplified snippet inside your render loop):
+
+int	render(t_game *g)
+{
+	double angle = g->player.angle * PI / 180;
+
+	// Movement
+	if (g->keys.w)
+		move_forward(g, angle);
+	if (g->keys.s)
+		move_backward(g, angle);
+	if (g->keys.a)
+		strafe_left(g, angle);
+	if (g->keys.d)
+		strafe_right(g, angle);
+
+	// Rotation
+	if (g->keys.left_arrow)
+	{
+		g->player.angle -= ROT_SPEED;
+		if (g->player.angle < 0)
+			g->player.angle += 360;
+	}
+	if (g->keys.right_arrow)
+	{
+		g->player.angle += ROT_SPEED;
+		if (g->player.angle >= 360)
+			g->player.angle -= 360;
+	}
+
+	// ... existing rendering code ...
+	return (0);
+}
+
+
+This ensures that even if the player holds W+D, the game updates both movements simultaneously.
+
+5. (Optional) Remove now-redundant bobbing logic
+
+Your old code adjusted g->player.bob_time based on which key was pressed.
+If you still want head-bobbing, move that logic into the render() loop too:
+
+if (g->keys.w || g->keys.a || g->keys.s || g->keys.d)
+	g->player.bob_time += 0.1;
+else
+	g->player.bob_time *= 0.9;
+
+🧠 Summary of Key Changes
+File	What to Change
+cub3d.h	Add t_keys struct and include it inside t_game
+controls.c	Add key_press() and key_release() functions
+cube_init.c	Replace single mlx_hook() with two (press/release) and memset(&g->keys, 0, sizeof(t_keys))
+render.c	Handle movement & rotation each frame based on g->keys

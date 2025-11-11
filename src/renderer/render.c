@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 22:04:13 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/10 16:30:57 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 11:28:23 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,43 @@ void	init_raycast_data2(t_game *g)
 	g->mrcd->is_door = 0;
 }
 
+void	scan_keys_status(t_game *g)
+{
+	double	angle;
+
+	angle = g->player.angle * PI / 180;
+	if (g->keys.w)
+		move_forward(g, angle);
+	if (g->keys.s)
+		move_backward(g, angle);
+	if (g->keys.a)
+		strafe_left(g, angle);
+	if (g->keys.d)
+		strafe_right(g, angle);
+	if (g->keys.left)
+	{
+		g->player.angle -= ROT_SPEED;
+		if (g->player.angle < 0)
+			g->player.angle += 360;
+	}
+	if (g->keys.right)
+	{
+		g->player.angle += ROT_SPEED;
+		if (g->player.angle >= 360)
+			g->player.angle -= 360;
+	}
+	if (g->keys.w || g->keys.s || g->keys.a || g->keys.d)
+		g->player.bob_time += 0.1;
+	else
+		g->player.bob_time *= 0.9;
+}
+
 int	render(t_game *g)
 {
 	init_raycast_data(g);
 	init_raycast_data2(g);
 	g->ray_angles = gc_malloc(sizeof(double) * g->win_w);
+	scan_keys_status(g);
 	render_vision_ray(g);
 	render_hell_yeah_pov(g);
 	render_minimap(g);

@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/10 21:57:49 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 11:29:09 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 # include "get_next_line.h"
 # include "../.mlx/mlx.h"
 
+# include <string.h> // remove later
+
 # define NO_WALL "./assets/north_wall.xpm"
 # define EA_WALL "./assets/east_wall.xpm"
 # define SO_WALL "./assets/south_wall.xpm"
@@ -36,7 +38,7 @@
 # define RAY_WIDTH			3
 # define PLAYER_SIZE		10
 # define ROT_SPEED			10
-# define MOVE_SPEED			0.1
+# define MOVE_SPEED			0.06
 # define WHITE				0xFFFFFF
 # define GROUND				0x2b2b2a
 # define SKY				0x87CEEB
@@ -49,6 +51,16 @@
 # define DOOR_MIN_ODIST		35
 # define WIN_W				1000
 # define WIN_H				1000
+
+typedef struct s_keys
+{
+	bool	w;
+	bool	a;
+	bool	s;
+	bool	d;
+	bool	left;
+	bool	right;
+}			t_keys;
 
 typedef struct s_collider
 {
@@ -243,6 +255,7 @@ typedef struct s_game
 	bool		mouse_control;
 	int			f_rgb;
 	int			c_rgb;
+	t_keys		keys;
 }	t_game;
 
 typedef struct s_mp
