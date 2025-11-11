@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/11 11:29:09 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 13:28:44 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@
 # include "get_next_line.h"
 # include "../.mlx/mlx.h"
 
-# include <string.h> // remove later
-
 # define NO_WALL "./assets/north_wall.xpm"
 # define EA_WALL "./assets/east_wall.xpm"
 # define SO_WALL "./assets/south_wall.xpm"
@@ -37,7 +35,7 @@
 # define MINIMAP_SIZE		10
 # define RAY_WIDTH			3
 # define PLAYER_SIZE		10
-# define ROT_SPEED			10
+# define ROT_SPEED			8
 # define MOVE_SPEED			0.06
 # define WHITE				0xFFFFFF
 # define GROUND				0x2b2b2a
@@ -370,7 +368,7 @@ int			close_game(t_game *g);
 int			pointer_motion(int x, int y, t_game *g);
 void		move_forward(t_game *g, double angle);
 void		move_backward(t_game *g, double angle);
-int			check_new_position(double new_x, double new_y, t_game *g/* , int dir */);
+int			check_new_position(double new_x, double new_y, t_game *g);
 void		use_door(t_game *g);
 void		set_door_status(t_game *g, char **map, int x, int y);
 int			is_not_passable(int c);
@@ -381,5 +379,11 @@ void		render_minimap(t_game *g);
 int			apply_fog_effect(int original_color, double distance);
 void		draw_pixel(t_mp *mp);
 int			is_within_limits(t_mp *mp, int x, int y);
+int			key_press(int keycode, t_game *g);
+int			key_release(int keycode, t_game *g);
+void		init_keys(t_keys *keys);
+void		manage_mouse_controls(t_game *g);
+void		scan_keys_status(t_game *g);
+void		scan_keys_rotate(t_game *g);
 
 #endif

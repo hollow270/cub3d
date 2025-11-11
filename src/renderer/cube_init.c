@@ -6,62 +6,11 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 21:56:14 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/11 11:30:49 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 13:15:25 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/cub3d.h"
-
-int	key_press(int keycode, t_game *g)
-{
-	if (keycode == 'w')
-		g->keys.w = true;
-	else if (keycode == 'a')
-		g->keys.a = true;
-	else if (keycode == 's')
-		g->keys.s = true;
-	else if (keycode == 'd')
-		g->keys.d = true;
-	else if (keycode == 65361 || keycode == 123)
-		g->keys.left = true;
-	else if (keycode == 65363 || keycode == 124)
-		g->keys.right = true;
-	else if (keycode == 65307)
-		return (close_game(g), 0);
-	else if (keycode == 101)
-		use_door(g);
-	else if (keycode == 109)
-	{
-		if (!g->mouse_control)
-		{
-			mlx_mouse_hide(g->vars->mlx, g->vars->win);
-			g->mouse_control = true;
-		}
-		else
-		{
-			mlx_mouse_show(g->vars->mlx, g->vars->win);
-			g->mouse_control = false;
-		}
-	}
-	return (0);
-}
-
-int	key_release(int keycode, t_game *g)
-{
-	if (keycode == 'w')
-		g->keys.w = false;
-	else if (keycode == 'a')
-		g->keys.a = false;
-	else if (keycode == 's')
-		g->keys.s = false;
-	else if (keycode == 'd')
-		g->keys.d = false;
-	else if (keycode == 65361 || keycode == 123)
-		g->keys.left = false;
-	else if (keycode == 65363 || keycode == 124)
-		g->keys.right = false;
-	return (0);
-}
 
 void	cube_init(t_vars *vars)
 {
@@ -76,10 +25,9 @@ void	cube_init(t_vars *vars)
 	g->img.data = (int *)mlx_get_data_addr(g->img.img,
 			&g->img.bpp, &g->img.line_len, &g->img.endian);
 	init_sprites(g);
-	memset(&g->keys, 0, sizeof(t_keys)); // remove later
+	init_keys(&g->keys);
 	g->mouse_control = false;
 	mlx_loop_hook(g->vars->mlx, render, g);
-	/* mlx_hook(vars->win, KeyPress, KeyPressMask, controls, g); */
 	mlx_hook(vars->win, KeyPress, KeyPressMask, key_press, g);
 	mlx_hook(vars->win, KeyRelease, KeyReleaseMask, key_release, g);
 	mlx_hook(vars->win, DestroyNotify, NoEventMask, close_game, g);
@@ -144,4 +92,14 @@ void	init_data_addresses(t_game *g)
 				&g->img.bpp, &g->img.line_len, &g->img.endian);
 	g->h_data = (int *)mlx_get_data_addr(g->h_img,
 			&g->img.bpp, &g->img.line_len, &g->img.endian);
+}
+
+void	init_keys(t_keys *keys)
+{
+	keys->w = false;
+	keys->s = false;
+	keys->d = false;
+	keys->a = false;
+	keys->left = false;
+	keys->right = false;
 }

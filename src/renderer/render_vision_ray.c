@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 22:15:16 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/10 16:58:43 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 13:19:39 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ void	save_middle_ray(t_game *g, double **ray_angles)
 	get_vertical_intercept(g, g->mrcd, (*ray_angles)[g->win_w / 2], 1);
 	choose_ray_tip2(g);
 	calc_wall_dist2(g, (*ray_angles)[g->win_w / 2]);
-	/* printf("player [%f, %f]\npoint [%f, %f] at %f\n", g->player.pos_x, g->player.pos_y, g->mrcd->tip_p->x, */
-	/* 	g->mrcd->tip_p->y, g->mrcd->tip_dist / CUBE_SIZE); */
 }
 
 void	init_ray_angles(t_game *g, double *ray_angles)

@@ -10,4 +10,5 @@ DONE	fix norm for the fog stuff.. or remove it
 DONE	implement a player collider to fix the old deprecated collider and to reduce lag when being too
 	close to and facing a wall
 DONE BEAUTIFULLY	implement collider sliding on obstacles
-remove "-g" from the CC flags in the makefile
+DONE	fully revamp the control system to allow moving diagonally
+DONE	remove "-g" from the CC flags in the makefile
