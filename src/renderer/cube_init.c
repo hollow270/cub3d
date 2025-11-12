@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/02 21:56:14 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/11 13:15:25 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/12 16:47:14 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	cube_init(t_vars *vars)
 	mlx_hook(vars->win, MotionNotify, PointerMotionMask, pointer_motion, g);
 	mlx_mouse_move(vars->mlx, vars->win, g->win_w / 2, g->win_h / 2);
 	mlx_loop(vars->mlx);
-	render(g);
 }
 
 void	init_game_data(t_game *g, t_vars *vars)

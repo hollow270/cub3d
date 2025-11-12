@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 20:02:15 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/10 16:06:26 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/12 16:50:19 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ int	check_duplicates(t_parse_data p_data)
 		{
 			if (ft_strcmp(content[i], content[j]) == 0 && count == 0)
 				count++;
-			else if (ft_strcmp(content[i], content[j]) == 0 && count > 0)
+			else if ((ft_strcmp(content[i], content[j]) == 0
+					|| ft_strncmp(content[i], content[j], 2) == 0) && count > 0)
 				return (0);
 			j++;
 		}

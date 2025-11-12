@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:29:22 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/11 13:28:44 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 20:10:10 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 # define BLACK				0x000000
 # define BROWN				0x964B00
 # define PLAYER_COLOR		0xFF0000
-# define COLLIDER_SZ		0.3
+# define COLLIDER_SZ		0.4
 # define PX_SIZE			3
 # define DOOR_OPEN_DIST		140
 # define DOOR_MIN_ODIST		35
@@ -312,6 +312,7 @@ int			ft_strncmp(const char *s1, const char *s2, size_t n);
 int			ft_atoi(const char *nptr);
 int			ft_splitlen(char **split);
 char		*ft_strstr(char *s1, char *s2);
+int			ft_charcount(char *s, int c);
 void		free_map_lines(t_map_line *head);
 void		*gc_malloc(size_t size);
 void		gc_free_all(void);
@@ -385,5 +386,6 @@ void		init_keys(t_keys *keys);
 void		manage_mouse_controls(t_game *g);
 void		scan_keys_status(t_game *g);
 void		scan_keys_rotate(t_game *g);
+int			check_color_data(t_assets *a);
 
 #endif

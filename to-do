@@ -12,3 +12,5 @@ DONE	implement a player collider to fix the old deprecated collider and to reduc
 DONE BEAUTIFULLY	implement collider sliding on obstacles
 DONE	fully revamp the control system to allow moving diagonally
 DONE	remove "-g" from the CC flags in the makefile
+DONE	fix parsing where 2 lines start with "F " but have different values
+DONE	fix color values where there are more than 2 colons

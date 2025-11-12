@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 15:10:45 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/07 15:17:09 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/11 20:15:22 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,14 @@ int	extract_data(t_parse_data *p_data)
 	t_map_line	*line;
 
 	p_data->assets = gc_malloc(sizeof(t_assets));
+	if (!p_data->assets)
+		return (0);
 	line = p_data->map_lines;
 	skip_leading_spaces(p_data);
 	initialize_rgb(p_data);
 	line = extract_assets(p_data);
-	if (!line)
-		return (0);
+	if (!line || !check_color_data(p_data->assets))
+		return (printf("Error\nInvalid color data\n"), 0);
 	p_data->assets->f_color = (p_data->assets->f_rgb[0] << 16)
 		| (p_data->assets->f_rgb[1] << 8) | p_data->assets->f_rgb[2];
 	p_data->assets->c_color = (p_data->assets->c_rgb[0] << 16)
@@ -70,7 +72,7 @@ void	extract_color(t_parse_data *p_data, t_map_line *cur_line, int flag)
 	int		i;
 
 	values = ft_split(cur_line->line + 2, ',');
-	if (ft_splitlen(values) != 3)
+	if (ft_splitlen(values) != 3 || ft_charcount(cur_line->line + 2, ',') != 2)
 		return ;
 	if (validate_values(values) == 0)
 	{
