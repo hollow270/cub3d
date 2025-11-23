@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 18:20:25 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/20 19:51:56 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/12 16:47:44 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ char	**extract_map(t_parse_data *p_data)
 		node = node->next;
 	node = node->next;
 	height = calculate_height(node);
-	ret = gc_malloc(sizeof(char *) * height + 1);
+	ret = gc_malloc(sizeof(char *) * (height + 1));
 	i = 0;
 	while (node && ft_strcmp(node->line, "MAP_END") != 0)
 	{

@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 11:26:18 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/18 11:28:39 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 21:55:08 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static t_garbage	**get_gc_head(void)
 	return (&head);
 }
 
-void    *gc_malloc(size_t size)
+void	*gc_malloc(size_t size)
 {
 	t_garbage	**head;
 	void		*ptr;
@@ -28,12 +28,12 @@ void    *gc_malloc(size_t size)
 	head = get_gc_head();
 	ptr = malloc(size);
 	if (!ptr)
-			return (NULL);
+		return (NULL);
 	node = malloc(sizeof(t_garbage));
 	if (!node)
 	{
-			free(ptr);
-			return (NULL);
+		free(ptr);
+		return (NULL);
 	}
 	node->ptr = ptr;
 	node->next = *head;
@@ -41,7 +41,7 @@ void    *gc_malloc(size_t size)
 	return (ptr);
 }
 
-void    gc_free_all(void)
+void	gc_free_all(void)
 {
 	t_garbage	**head;
 	t_garbage	*current;
@@ -51,10 +51,10 @@ void    gc_free_all(void)
 	current = *head;
 	while (current)
 	{
-			next = current->next;
-			free(current->ptr);
-			free(current);
-			current = next;
+		next = current->next;
+		free(current->ptr);
+		free(current);
+		current = next;
 	}
 	*head = NULL;
 }

@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 20:56:03 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/18 13:29:04 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 21:49:06 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,6 @@ static void	ft_excess(t_fragment *p_head, t_fragment *last, char *line, int i)
 	while (j < last->sz)
 		p_head->fragment[i++] = last->fragment[j++];
 	p_head->sz = i;
-	//ft_free_nodes(p_head);
 }
 
 /* ft_deduce_line:
@@ -100,9 +99,9 @@ char	*ft_defragment(t_fragment *p_head)
 	length = ft_calc_len(p_head);
 	line = gc_malloc((length + 1) * sizeof(char));
 	if (!line)
-		return (/*ft_free_nodes(p_head), */NULL);
+		return (NULL);
 	if (length == 0)
-		return (/*free(line), ft_free_nodes(p_head), */NULL);
+		return (NULL);
 	i = 0;
 	node = p_head;
 	while (node->stop == 0)

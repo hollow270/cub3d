@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:19:52 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/21 16:01:31 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 19:21:16 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@ int	parse_map_file(char *file_name, t_parse_data *p_data)
 	int	fd;
 
 	p_data->is_valid = 1;
+	p_data->has_door = 0;
 	fd = open(file_name, O_RDONLY);
 	if (fd < 0)
-		return (printf("Error\nCan't open/inexistent map file\n"), p_data->is_valid = 0, 0);
+		return (printf("Error\nCan't open/inexistent map file\n"),
+			p_data->is_valid = 0, 0);
 	p_data->file_content = get_file_content(fd);
 	if (!p_data->file_content)
-		return (close(fd), printf("Error\nEmpty map/empty lines in map/incomplete map\n"), 0);
+		return (close(fd), printf("Error\nIncomplete map\n"), 0);
 	p_data->map_lines = interpret_file_content(p_data);
 	if (extract_data(p_data) == 0)
 		return (close(fd), 0);
@@ -36,12 +38,12 @@ int	parse_map_file(char *file_name, t_parse_data *p_data)
 		return (close(fd), 0);
 	p_data->matrix = extract_map(p_data);
 	if (!p_data->matrix)
-		return (close(fd), printf("Error\nCan't extract map, probable malloc failure\n"), 0);
+		return (close(fd), printf("Error\nCan't extract map\n"), 0);
 	if (check_enclosed(p_data) == 0)
 		return (close(fd), printf("Error\nMap is not enclosed in walls\n"), 0);
 	if (get_player_pos(p_data) == 0)
-		return (close(fd), printf("Error\nMore than one player in map/Invalid char found in map\n"), 0);
-	printf("p_x = [%d]\np_y = [%d]\n", p_data->p_x, p_data->p_y);
+		return (close(fd), printf("Error\nInvalid map chars\n"), 0);
+	fill_map_space(p_data);
 	return (close(fd), 1);
 }
 
@@ -74,7 +76,7 @@ char	*join_file_lines(int fd)
 			in_map = 1;
 		else if (in_map == 1 && buffer[0] == '\n' && ft_strchr(prvs, '0'))
 			return (NULL);
-		if(!has_space_only(buffer))
+		if (!has_space_only(buffer))
 			ret = ft_strjoin(ret, buffer);
 		prvs = buffer;
 	}

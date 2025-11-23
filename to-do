@@ -1,0 +1,16 @@
+DONE	fix minimap
+DONE	fix .cub file that has dubplicate color lines being valid and running
+DONE	fix .cub file having a 'D' character but not including the door texture path
+DONE	fix colors in .cub file not being used at all
+DONE	add bonus rule in the makfile
+DONE	make the walls lighter the farther away they are (to give a foggy impression)
+DONE	fix the parsing error where a trailing line in the mao has 0's and a 1 at
+	the end but the 0's are not enclosed by anything up and down
+DONE	fix norm for the fog stuff.. or remove it
+DONE	implement a player collider to fix the old deprecated collider and to reduce lag when being too
+	close to and facing a wall
+DONE BEAUTIFULLY	implement collider sliding on obstacles
+DONE	fully revamp the control system to allow moving diagonally
+DONE	remove "-g" from the CC flags in the makefile
+DONE	fix parsing where 2 lines start with "F " but have different values
+DONE	fix color values where there are more than 2 colons

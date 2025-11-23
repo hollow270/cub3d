@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 17:31:42 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/20 20:43:32 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/03 18:05:58 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,14 @@ void	skip_leading_spaces(t_parse_data *p_data)
 int	is_map(char *s)
 {
 	int	i;
-	int	count;
 
 	i = 0;
-	count = 0;
 	while (s[i])
 	{
 		if (s[i] != ' ' && s[i] != '1'
-				&& s[i] != '0' && s[i] != 'N'
-				&& s[i] != 'E' && s[i] != 'S'
-				&& s[i] != 'W' && s[i] != '\n')
+			&& s[i] != '0' && s[i] != 'N'
+			&& s[i] != 'E' && s[i] != 'S'
+			&& s[i] != 'W' && s[i] != '\n')
 			return (0);
 		i++;
 	}

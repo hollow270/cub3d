@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 20:55:51 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/09/18 13:28:28 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/11/01 21:29:06 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,12 +107,12 @@ static char	*ft_get_line(t_fragment *p_head, int fd)
 	{
 		node = gc_malloc(sizeof(t_fragment));
 		if (!node)
-			return (/*ft_free_nodes(p_head), */NULL);
+			return (NULL);
 		node->sz = read(fd, node->fragment, BUFFER_SIZE);
 		if (node->sz == -1)
 		{
 			p_head->sz = 0;
-			return (/*free(node), ft_free_nodes(p_head), */NULL);
+			return (NULL);
 		}
 		ft_link_node(p_head, node);
 	}
