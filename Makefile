@@ -6,9 +6,6 @@ INC = inc/
 MLXINC = .mlx/
 
 HED = inc/cub3d.h
-MLXHED = .mlx/mlx.h # hada 7tito
-#SRC = src/main.c utils/strutils0.c src/parser/parse_map_file.c
-#SRC = $(shell find . -name "*.c")
 SRC = $(shell find . -name "*.c" -not -path "./.mlx/*")
 
 OBJ = $(SRC:.c=.o)
