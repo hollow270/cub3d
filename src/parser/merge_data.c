@@ -6,7 +6,7 @@
 /*   By: yhajbi <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 13:37:38 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/12/03 17:16:22 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/12/03 19:30:58 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ void	merge_data(t_parse_data p_data, t_game *g)
 
 	// 2. Player Direction (Math Required!)
 	// Your parser has 'angle' (radians). His raycaster needs vectors.
-	g->player.dir_x = cos(p_data.angle);
-	g->player.dir_y = sin(p_data.angle);
+	g->player.dir_x = -cos(p_data.angle);
+	g->player.dir_y = -sin(p_data.angle);
 
 	// 3. Camera Plane (FOV)
 	// Perpendicular to direction. 0.66 is standard for ~66 fov

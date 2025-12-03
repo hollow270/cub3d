@@ -287,6 +287,9 @@ void	draw_hands(t_game *gm)
     int bob = (int)(sin(gm->hand_phase) * HAND_BOB_PIX);
     int base_x = (WIDTH - target_w) / 2;
     int base_y = HEIGHT - target_h - 8 + bob;
+	
+	int	offset = 40;									// yhajbi's code for a pov offset
+	base_y += offset;									// yhajbi's code for a pov offset
 
     for (int ty = 0; ty < target_h; ++ty)
     {

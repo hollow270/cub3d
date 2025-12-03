@@ -52,8 +52,8 @@ void	move_player(t_game *gm)
 	}
 	if (gm->keys.right)
 	{
-		nx = p->x + p->dir_y * MOVE_SPEED;
-		ny = p->y - p->dir_x * MOVE_SPEED;
+		nx = p->x - p->dir_y * MOVE_SPEED;		// old code: nx = p->x + p->dir_y * MOVE_SPEED;
+		ny = p->y + p->dir_x * MOVE_SPEED;		// old code: ny = p->y - p->dir_x * MOVE_SPEED;
 		if (!collides_at(gm, nx, p->y))
 			p->x = nx;
 		if (!collides_at(gm, p->x, ny))
@@ -62,8 +62,8 @@ void	move_player(t_game *gm)
 	}
 	if (gm->keys.left)
 	{
-		nx = p->x - p->dir_y * MOVE_SPEED;
-		ny = p->y + p->dir_x * MOVE_SPEED;
+		nx = p->x + p->dir_y * MOVE_SPEED;		// old code: nx = p->x - p->dir_y * MOVE_SPEED;
+		ny = p->y - p->dir_x * MOVE_SPEED;		// old code: ny = p->y + p->dir_x * MOVE_SPEED;
 		if (!collides_at(gm, nx, p->y))
 			p->x = nx;
 		if (!collides_at(gm, p->x, ny))
@@ -118,7 +118,7 @@ int mouse_move(int x, int y, t_game *g)
 	int dx = x - cx;
 	if (dx != 0)
 	{
-		angle = -dx * MOUSE_ROT_SPEED;
+		angle = dx * MOUSE_ROT_SPEED;		// old code: angle = -dx * MOUSE_ROT_SPEED;
 		rotate_player(&g->player, angle);
 	}
 	mlx_mouse_move(g->mlx, g->win, cx, cy);
