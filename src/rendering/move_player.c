@@ -1,4 +1,4 @@
-#include "cub3d.h"
+#include "../../inc/cub3d.h"
 
 static int collides_at(t_game *gm, double x, double y)
 {

@@ -16,7 +16,7 @@ void destroy_game(t_game *g, const char *msg)
 		mlx_destroy_display(g->mlx);
 		free(g->mlx);
 	}
-	free_map(g->map);
+	/* free_map(g->map); */
 	exit(0);
 }
 bool	is_wall(t_game *gm, int x, int y)
@@ -129,63 +129,63 @@ void	put_pixel(t_game *gm, int x, int y, int color)
 	*(unsigned int *)dst = color;
 }
 
-static int	set_player_spawn(t_game *gm)
-{
-	int     y;
-	int     x;
-	char    c;
-	const double fov = 0.66;
-
-	y = 0;
-	while (gm->map[y])
-	{
-		x = 0;
-		while (gm->map[y][x])
-		{
-			c = gm->map[y][x];
-			if (c == 'N' || c == 'S' || c == 'E' || c == 'W')
-			{
-				gm->player.x = x + 0.5;
-				gm->player.y = y + 0.5;
-				if (c == 'N') { gm->player.dir_x = 0;
-					gm->player.dir_y = -1; }
-				if (c == 'S') { gm->player.dir_x = 0;
-					gm->player.dir_y = 1; }
-				if (c == 'E') { gm->player.dir_x = 1;
-					gm->player.dir_y = 0; }
-				if (c == 'W') { gm->player.dir_x = -1;
-					gm->player.dir_y = 0; }
-				gm->player.plane_x = gm->player.dir_y * fov;
-				gm->player.plane_y = -gm->player.dir_x * fov;
-				gm->map[y][x] = '0';
-				return 1;
-			}
-			x++;
-		}
-		y++;
-	}
-	y = 0;
-	while (gm->map[y])
-	{
-		x = 0;
-		while (gm->map[y][x])
-		{
-			if (gm->map[y][x] == '0')
-			{
-				gm->player.x = x + 0.5;
-				gm->player.y = y + 0.5;
-				gm->player.dir_x = 1; // default east
-				gm->player.dir_y = 0;
-				gm->player.plane_x = gm->player.dir_y * fov;
-				gm->player.plane_y = -gm->player.dir_x * fov;
-				return 1;
-			}
-			x++;
-		}
-		y++;
-	}
-	return 0;
-}
+/* static int	set_player_spawn(t_game *gm) */
+/* { */
+/* 	int     y; */
+/* 	int     x; */
+/* 	char    c; */
+/* 	const double fov = 0.66; */
+/**/
+/* 	y = 0; */
+/* 	while (gm->map[y]) */
+/* 	{ */
+/* 		x = 0; */
+/* 		while (gm->map[y][x]) */
+/* 		{ */
+/* 			c = gm->map[y][x]; */
+/* 			if (c == 'N' || c == 'S' || c == 'E' || c == 'W') */
+/* 			{ */
+/* 				gm->player.x = x + 0.5; */
+/* 				gm->player.y = y + 0.5; */
+/* 				if (c == 'N') { gm->player.dir_x = 0; */
+/* 					gm->player.dir_y = -1; } */
+/* 				if (c == 'S') { gm->player.dir_x = 0; */
+/* 					gm->player.dir_y = 1; } */
+/* 				if (c == 'E') { gm->player.dir_x = 1; */
+/* 					gm->player.dir_y = 0; } */
+/* 				if (c == 'W') { gm->player.dir_x = -1; */
+/* 					gm->player.dir_y = 0; } */
+/* 				gm->player.plane_x = gm->player.dir_y * fov; */
+/* 				gm->player.plane_y = -gm->player.dir_x * fov; */
+/* 				gm->map[y][x] = '0'; */
+/* 				return 1; */
+/* 			} */
+/* 			x++; */
+/* 		} */
+/* 		y++; */
+/* 	} */
+/* 	y = 0; */
+/* 	while (gm->map[y]) */
+/* 	{ */
+/* 		x = 0; */
+/* 		while (gm->map[y][x]) */
+/* 		{ */
+/* 			if (gm->map[y][x] == '0') */
+/* 			{ */
+/* 				gm->player.x = x + 0.5; */
+/* 				gm->player.y = y + 0.5; */
+/* 				gm->player.dir_x = 1; // default east */
+/* 				gm->player.dir_y = 0; */
+/* 				gm->player.plane_x = gm->player.dir_y * fov; */
+/* 				gm->player.plane_y = -gm->player.dir_x * fov; */
+/* 				return 1; */
+/* 			} */
+/* 			x++; */
+/* 		} */
+/* 		y++; */
+/* 	} */
+/* 	return 0; */
+/* } */
 
 static int load_tex_any(t_game *gm, t_tex *tex, const char *path)
 {
@@ -308,61 +308,61 @@ void	draw_hands(t_game *gm)
     }
 }
 
-int	init_game(t_game *gm, char *filename)
-{
-	memset(gm, 0, sizeof(*gm));
-	gm->mlx = mlx_init();
-	if (!gm->mlx)
-		return (1);
-	gm->win = mlx_new_window(gm->mlx, WIDTH, HEIGHT, "CUB3D");
-	if (!gm->win)
-		return (1);
-	gm->frame.img = mlx_new_image(gm->mlx, WIDTH, HEIGHT);
-	if (!gm->frame.img)
-		return (1);
-	gm->frame.data_img = mlx_get_data_addr(gm->frame.img, &gm->frame.bpp, &gm->frame.line_len, &gm->frame.endian);
-	if (!gm->frame.data_img)
-		return (1);
-	if (parse_config(gm, filename))
-		return (1);
-	if (load_textures(gm))
-	{
-		destroy_game(gm, "Failed to load textures\n");
-		return 1;
-	}
-	// compute max width for reference (not used by is_wall)
-	gm->map_w = (int)strlen(gm->map[0]);
-	{
-		int i = 1;
-		while (gm->map[i])
-		{
-			int len = (int)strlen(gm->map[i]);
-			if (len > gm->map_w)
-				gm->map_w = len;
-			i++;
-		}
-	}
-	if (!set_player_spawn(gm))
-		return (1);
-	//if somehow inside a wall, try to nudge to nearest floor
-	if (is_wall(gm, (int)gm->player.x, (int)gm->player.y))
-	{
-		int dy = -1;
-		while (dy <= 1)
-		{
-			int dx = -1;
-			while (dx <= 1)
-			{
-				if (!is_wall(gm, (int)gm->player.x + dx, (int)gm->player.y + dy))
-				{ gm->player.x += dx; gm->player.y += dy; dy = 2; break; }
-				dx++;
-			}
-			dy++;
-		}
-	}
-	mlx_mouse_hide(gm->mlx, gm->win);
-	return (0);
-}
+/* int	init_game(t_game *gm, char *filename) */
+/* { */
+/* 	memset(gm, 0, sizeof(*gm)); */
+/* 	gm->mlx = mlx_init(); */
+/* 	if (!gm->mlx) */
+/* 		return (1); */
+/* 	gm->win = mlx_new_window(gm->mlx, WIDTH, HEIGHT, "CUB3D"); */
+/* 	if (!gm->win) */
+/* 		return (1); */
+/* 	gm->frame.img = mlx_new_image(gm->mlx, WIDTH, HEIGHT); */
+/* 	if (!gm->frame.img) */
+/* 		return (1); */
+/* 	gm->frame.data_img = mlx_get_data_addr(gm->frame.img, &gm->frame.bpp, &gm->frame.line_len, &gm->frame.endian); */
+/* 	if (!gm->frame.data_img) */
+/* 		return (1); */
+/* 	if (parse_config(gm, filename)) */
+/* 		return (1); */
+/* 	if (load_textures(gm)) */
+/* 	{ */
+/* 		destroy_game(gm, "Failed to load textures\n"); */
+/* 		return 1; */
+/* 	} */
+/* 	// compute max width for reference (not used by is_wall) */
+/* 	gm->map_w = (int)strlen(gm->map[0]); */
+/* 	{ */
+/* 		int i = 1; */
+/* 		while (gm->map[i]) */
+/* 		{ */
+/* 			int len = (int)strlen(gm->map[i]); */
+/* 			if (len > gm->map_w) */
+/* 				gm->map_w = len; */
+/* 			i++; */
+/* 		} */
+/* 	} */
+/* 	if (!set_player_spawn(gm)) */
+/* 		return (1); */
+/* 	//if somehow inside a wall, try to nudge to nearest floor */
+/* 	if (is_wall(gm, (int)gm->player.x, (int)gm->player.y)) */
+/* 	{ */
+/* 		int dy = -1; */
+/* 		while (dy <= 1) */
+/* 		{ */
+/* 			int dx = -1; */
+/* 			while (dx <= 1) */
+/* 			{ */
+/* 				if (!is_wall(gm, (int)gm->player.x + dx, (int)gm->player.y + dy)) */
+/* 				{ gm->player.x += dx; gm->player.y += dy; dy = 2; break; } */
+/* 				dx++; */
+/* 			} */
+/* 			dy++; */
+/* 		} */
+/* 	} */
+/* 	mlx_mouse_hide(gm->mlx, gm->win); */
+/* 	return (0); */
+/* } */
 
 int close_win(t_game *g)
 {

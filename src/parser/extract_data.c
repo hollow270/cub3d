@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 15:10:45 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/11 20:15:22 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/12/03 17:39:15 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int	extract_data(t_parse_data *p_data)
 		| (p_data->assets->f_rgb[1] << 8) | p_data->assets->f_rgb[2];
 	p_data->assets->c_color = (p_data->assets->c_rgb[0] << 16)
 		| (p_data->assets->c_rgb[1] << 8) | p_data->assets->c_rgb[2];
+	p_data->assets->hell_yeah = ft_strdup("./assets/budweiser.xpm");
 	return (1);
 }
 

@@ -1,4 +1,4 @@
-#include "cub3d.h"
+#include "../../inc/cub3d.h"
 
 bool    inside_portal(t_game *gm, int map_x, int map_y, double side_distx, double side_disty, double ray_dir_x, double ray_dir_y, int x, int y)
 {

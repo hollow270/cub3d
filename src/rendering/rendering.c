@@ -1,4 +1,4 @@
-#include "cub3d.h"
+#include "../../inc/cub3d.h"
 
 unsigned int texel_at(t_tex *t, int x, int y)
 {
