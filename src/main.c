@@ -6,7 +6,7 @@
 /*   By: yhajbi <yhajbi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 11:28:41 by yhajbi            #+#    #+#             */
-/*   Updated: 2025/11/28 15:01:33 by yhajbi           ###   ########.fr       */
+/*   Updated: 2025/12/03 17:16:56 by yhajbi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,7 @@ int	main(int argc, char *argv[])
 	printf("west texture path = [%s]\n", g.tex_path[TEX_W]);
 	printf("door texture path = [%s]\n", g.door_path);
 
-	/*
-		* RENDERING
-		* STUFF
-		* 			*/
+	start_game(&g);
 
 	gc_free_all();
 	return (0);
